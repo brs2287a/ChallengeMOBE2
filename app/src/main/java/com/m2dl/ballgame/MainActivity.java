@@ -60,18 +60,19 @@ public class MainActivity extends Activity implements View.OnTouchListener, Sens
         int action = MotionEventCompat.getActionMasked(event);
         switch (action) {
             case (MotionEvent.ACTION_DOWN):
-                switch (gameView.direction) {
+                gameView.setActualSpeed(gameView.getActualSpeed()+1);
+                switch (gameView.getDirection()) {
                     case HAUT:
-                        gameView.direction = gameView.randomDirection(gameView.direction);
+                        gameView.setDirection(gameView.randomDirection(gameView.getDirection()));
                         break;
                     case BAS:
-                        gameView.direction = gameView.randomDirection(gameView.direction);
+                        gameView.setDirection(gameView.randomDirection(gameView.getDirection()));
                         break;
                     case DROITE:
-                        gameView.direction = gameView.randomDirection(gameView.direction);
+                        gameView.setDirection(gameView.randomDirection(gameView.getDirection()));
                         break;
                     case GAUCHE:
-                        gameView.direction = gameView.randomDirection(gameView.direction);
+                        gameView.setDirection(gameView.randomDirection(gameView.getDirection()));
 
                         break;
                 }

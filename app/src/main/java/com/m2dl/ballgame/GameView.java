@@ -31,7 +31,7 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Sen
     private GameThread thread;
     private int x = 250;
     private int y = 250;
-    public Direction direction;
+    private Direction direction;
     private SensorManager sensorManager;
     private int actualSpeed = 5;
     private double acceleration = 0;
@@ -97,7 +97,9 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Sen
             case GAUCHE:
                 x = (int) Math.round(x - actualSpeed * acceleration);
                 break;
+
         }
+
     }
 
     @Override
@@ -111,6 +113,8 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Sen
         }
     }
 
+
+
     public static Direction randomDirection()  {
         // get an array of all the cards
         Direction[] directions=Direction.values();
@@ -118,6 +122,7 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Sen
         Random random = new Random();
 
         return directions[random.nextInt(directions.length)];
+
     }
 
     public static Direction randomDirection(Direction direction)  {
@@ -132,6 +137,7 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Sen
         Random random = new Random();
 
         return directionArrayList.get(random.nextInt(directionArrayList.size()));
+
     }
 
     @Override
@@ -213,5 +219,21 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Sen
     @Override
     public void onAccuracyChanged(Sensor sensor, int accuracy) {
 
+    }
+
+    public Direction getDirection() {
+        return direction;
+    }
+
+    public void setDirection(Direction direction) {
+        this.direction = direction;
+    }
+
+    public int getActualSpeed() {
+        return actualSpeed;
+    }
+
+    public void setActualSpeed(int actualSpeed) {
+        this.actualSpeed = actualSpeed;
     }
 }
