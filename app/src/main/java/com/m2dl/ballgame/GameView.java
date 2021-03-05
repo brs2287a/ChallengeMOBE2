@@ -25,12 +25,12 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Random;
 
-public class GameView extends SurfaceView implements SurfaceHolder.Callback, SensorEventListener {
+public class GameView extends SurfaceView implements SurfaceHolder.Callback, SensorEventListener{
     private final Sensor sensor;
     private GameThread thread;
     private int x = 250;
     private int y = 250;
-    public Direction direction;
+    private Direction direction;
     private SensorManager sensorManager;
     private int actualSpeed = 5;
     private double acceleration = 0;
@@ -209,5 +209,21 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Sen
     @Override
     public void onAccuracyChanged(Sensor sensor, int accuracy) {
 
+    }
+
+    public Direction getDirection() {
+        return direction;
+    }
+
+    public void setDirection(Direction direction) {
+        this.direction = direction;
+    }
+
+    public int getActualSpeed() {
+        return actualSpeed;
+    }
+
+    public void setActualSpeed(int actualSpeed) {
+        this.actualSpeed = actualSpeed;
     }
 }
