@@ -1,8 +1,5 @@
 package com.m2dl.ballgame;
 
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.view.MotionEventCompat;
-
 import android.app.Activity;
 import android.content.Context;
 import android.content.SharedPreferences;
@@ -12,8 +9,6 @@ import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
 import android.os.Bundle;
-import android.os.Handler;
-import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.Window;
@@ -49,15 +44,15 @@ public class MainActivity extends Activity implements View.OnTouchListener, Sens
         editor.putInt("BallColor", ball_color);
         editor.apply();
 
-        gameView = new GameView(this);
+        setContentView(R.layout.activity_main);
+        gameView = findViewById(R.id.surfaceView);
         gameView.setOnTouchListener(this);
-        setContentView(gameView);
     }
 
     @Override
     public boolean onTouch(View v, MotionEvent event) {
 
-        int action = MotionEventCompat.getActionMasked(event);
+        int action = event.getActionMasked();
         switch (action) {
             case (MotionEvent.ACTION_DOWN):
                 gameView.setActualSpeed(gameView.getActualSpeed()+1);

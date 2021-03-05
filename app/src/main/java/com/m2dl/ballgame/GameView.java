@@ -1,7 +1,6 @@
 package com.m2dl.ballgame;
 
 import android.content.Context;
-import android.content.SharedPreferences;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
@@ -9,39 +8,37 @@ import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
-import android.os.Handler;
-import android.preference.PreferenceManager;
-import android.view.MotionEvent;
+import android.util.AttributeSet;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
-import android.view.View;
+import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.LinkedList;
-import java.util.List;
 import java.util.Random;
 
 public class GameView extends SurfaceView implements SurfaceHolder.Callback, SensorEventListener {
 
     private final Sensor sensor;
+    private final int width;
+    private final int height;
+    private final long debut;
     private GameThread thread;
-    private int x = 250;
-    private int y = 250;
+    private int x;
+    private int y;
     private Direction direction;
     private SensorManager sensorManager;
-    private int actualSpeed = 5;
+    private int actualSpeed = 1;
     private double acceleration = 0;
+    private int rayon = 50;
+    private boolean dejaFini = false;
 
     private int background_color;
     private int ball_color;
 
-
-    public GameView(Context context) {
-        super(context);
+    public GameView(Context context, AttributeSet attrs) {
+        super(context, attrs);
         getHolder().addCallback(this);
         setFocusable(true);
         direction = randomDirection();
@@ -53,6 +50,11 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Sen
         sensorManager = (SensorManager) context.getSystemService(Context.SENSOR_SERVICE);
         sensor = sensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
         sensorManager.registerListener(this, sensor, SensorManager.SENSOR_DELAY_GAME);
+        width = this.getResources().getDisplayMetrics().widthPixels;
+        height = this.getResources().getDisplayMetrics().heightPixels;
+        x = width / 2;
+        y = height / 2;
+        debut = System.currentTimeMillis() / 1000;
     }
 
     @Override
@@ -84,22 +86,34 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Sen
         background_color = MainActivity.sharedPreferences.getInt("BackgroundColor", Color.BLACK);
         ball_color = MainActivity.sharedPreferences.getInt("BallColor", Color.WHITE);
 
-        switch (direction){
-            case HAUT:
-                y = (int) Math.round(y + actualSpeed * acceleration);
-                break;
-            case BAS:
-                y = (int) Math.round(y - actualSpeed * acceleration);
-                break;
-            case DROITE:
-                x = (int) Math.round(x + actualSpeed * acceleration);
-                break;
-            case GAUCHE:
-                x = (int) Math.round(x - actualSpeed * acceleration);
-                break;
-
+        if (!isFinDujeu()) {
+            switch (direction) {
+                case HAUT:
+                    y = (int) Math.round(y + actualSpeed * acceleration);
+                    break;
+                case BAS:
+                    y = (int) Math.round(y - actualSpeed * acceleration);
+                    break;
+                case DROITE:
+                    x = (int) Math.round(x + actualSpeed * acceleration);
+                    break;
+                case GAUCHE:
+                    x = (int) Math.round(x - actualSpeed * acceleration);
+                    break;
+            }
         }
 
+    }
+
+    private boolean isFinDujeu() {
+        boolean fin = x + rayon > width || x - rayon < 0 || y - rayon < 0 || y + rayon > height;
+        if (!dejaFini && fin) {
+            TextView tv = findViewById(R.id.textView2);
+            int score = (int) (System.currentTimeMillis() / 1000 - debut);
+            tv.setText("Jeu terminé, votre score est " + score);
+            dejaFini = true;
+        }
+        return fin;
     }
 
     @Override
@@ -109,7 +123,7 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Sen
             canvas.drawColor(this.background_color);
             Paint paint = new Paint();
             paint.setColor(this.ball_color);
-            canvas.drawCircle(x, y, 50,  paint);
+            canvas.drawCircle(x, y, rayon,  paint);
         }
     }
 
