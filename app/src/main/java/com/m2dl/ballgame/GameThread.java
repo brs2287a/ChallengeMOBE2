@@ -32,7 +32,7 @@ public class GameThread extends Thread {
                     this.gameView.update();
                     this.gameView.draw(canvas);
                 }
-                sleep(100);
+                sleep(10);
             } catch (Exception e) {}
             finally {
                 if (canvas != null) {
