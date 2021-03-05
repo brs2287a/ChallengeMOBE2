@@ -26,6 +26,7 @@ import java.util.List;
 import java.util.Random;
 
 public class GameView extends SurfaceView implements SurfaceHolder.Callback, SensorEventListener {
+
     private final Sensor sensor;
     private GameThread thread;
     private int x = 250;
@@ -35,6 +36,8 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Sen
     private int actualSpeed = 5;
     private double acceleration = 0;
 
+    private int background_color;
+    private int ball_color;
 
 
     public GameView(Context context) {
@@ -42,6 +45,10 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Sen
         getHolder().addCallback(this);
         setFocusable(true);
         direction = randomDirection();
+
+        background_color = MainActivity.sharedPreferences.getInt("BackgroundColor", Color.BLACK);
+        ball_color = MainActivity.sharedPreferences.getInt("BallColor", Color.WHITE);
+
         thread = new GameThread(getHolder(), this);
         sensorManager = (SensorManager) context.getSystemService(Context.SENSOR_SERVICE);
         sensor = sensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
@@ -74,6 +81,9 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Sen
     }
 
     public void update() {
+        background_color = MainActivity.sharedPreferences.getInt("BackgroundColor", Color.BLACK);
+        ball_color = MainActivity.sharedPreferences.getInt("BallColor", Color.WHITE);
+
         switch (direction){
             case HAUT:
                 y = (int) Math.round(y + actualSpeed * acceleration);
@@ -87,23 +97,19 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Sen
             case GAUCHE:
                 x = (int) Math.round(x - actualSpeed * acceleration);
                 break;
-
         }
-
     }
 
     @Override
     public void draw(Canvas canvas) {
         super.draw(canvas);
         if (canvas != null) {
-            canvas.drawColor(Color.WHITE);
+            canvas.drawColor(this.background_color);
             Paint paint = new Paint();
-            paint.setColor(Color.rgb(250, 0, 0));
+            paint.setColor(this.ball_color);
             canvas.drawCircle(x, y, 50,  paint);
         }
     }
-
-
 
     public static Direction randomDirection()  {
         // get an array of all the cards
@@ -112,7 +118,6 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Sen
         Random random = new Random();
 
         return directions[random.nextInt(directions.length)];
-
     }
 
     public static Direction randomDirection(Direction direction)  {
@@ -127,7 +132,6 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Sen
         Random random = new Random();
 
         return directionArrayList.get(random.nextInt(directionArrayList.size()));
-
     }
 
     @Override
