@@ -7,42 +7,37 @@ import android.graphics.Color;
 import android.graphics.Paint;
 import android.os.Handler;
 import android.preference.PreferenceManager;
+import android.view.MotionEvent;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 import android.view.View;
 
 import androidx.annotation.NonNull;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Random;
 
 import static android.content.Context.MODE_PRIVATE;
 import static android.preference.PreferenceManager.getDefaultSharedPreferencesName;
 
 public class GameView extends SurfaceView implements SurfaceHolder.Callback {
     private GameThread thread;
-    private int x = 0;
-    private LinkedList<Integer> ys = new LinkedList<>();;
+    private int x = 250;
+    private int y = 250;
+    public Direction direction;
 
-    // on défini un handler qui représentera notre timer :
-    private Handler mHandler;
 
-    // un Runnable qui sera appelé par le timer
-    private Runnable mUpdateTimeTask = new Runnable() {
-        public void run() {
-            ys.add(ys.getLast()+200);
-            mHandler.postDelayed(this, 1000);
-        }
-    };
 
     public GameView(Context context) {
         super(context);
         getHolder().addCallback(this);
         setFocusable(true);
-        ys.add(MainActivity.sharedPref.getInt("valeur_y",0));
+        direction = randomDirection();
         thread = new GameThread(getHolder(), this);
-        mHandler = new Handler();
-        mHandler.postDelayed(mUpdateTimeTask, 1000);
     }
 
     @Override
@@ -71,7 +66,22 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
     }
 
     public void update() {
-        x = (x + 1) % 300;
+        switch (direction){
+            case HAUT:
+                y = (y +1);
+                break;
+            case BAS:
+                y = (y - 1);
+                break;
+            case DROITE:
+                x = (x + 1);
+                break;
+            case GAUCHE:
+                x = (x - 1);
+                break;
+
+        }
+
     }
 
     @Override
@@ -81,9 +91,34 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
             canvas.drawColor(Color.WHITE);
             Paint paint = new Paint();
             paint.setColor(Color.rgb(250, 0, 0));
-            for(Integer yCurr : ys) {
-                canvas.drawRect(x, yCurr, x + 100, yCurr + 100, paint);
+            canvas.drawCircle(x, y, 50,  paint);
+        }
+    }
+
+
+
+    public static Direction randomDirection()  {
+        // get an array of all the cards
+        Direction[] directions=Direction.values();
+            // this generates random numbers
+        Random random = new Random();
+
+        return directions[random.nextInt(directions.length)];
+
+    }
+
+    public static Direction randomDirection(Direction direction)  {
+        ArrayList<Direction> directionArrayList = new ArrayList<>();
+        for (Direction dir : Direction.values()) {
+            if(dir != direction){
+                directionArrayList.add(dir);
             }
         }
+
+        // this generates random numbers
+        Random random = new Random();
+
+        return directionArrayList.get(random.nextInt(directionArrayList.size()));
+
     }
 }

@@ -1,28 +1,24 @@
 package com.m2dl.ballgame;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.view.MotionEventCompat;
 
 import android.app.Activity;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.os.Handler;
+import android.util.Log;
+import android.view.MotionEvent;
+import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
 
-public class MainActivity extends Activity {
-    static SharedPreferences sharedPref;
+import static java.lang.Thread.sleep;
 
-    // on défini un handler qui représentera notre timer :
- private Handler mHandler;
+public class MainActivity extends Activity implements View.OnTouchListener {
+    private GameView gameView;
 
-        // un Runnable qui sera appelé par le timer
-        private Runnable mUpdateTimeTask = new Runnable() {
-            public void run() {
-            // inserez ici ce que vous voulez executer...
-             mHandler.postDelayed(this, 1000);
-             }
-        };
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -30,14 +26,36 @@ public class MainActivity extends Activity {
         getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,
                 WindowManager.LayoutParams.FLAG_FULLSCREEN);
         this.requestWindowFeature(Window.FEATURE_NO_TITLE);
-        sharedPref = this.getPreferences(Context.MODE_PRIVATE);
 
-        int valeur_y = sharedPref.getInt("valeur_y", 0);
-        valeur_y = (valeur_y + 100) % 400;
-
-        SharedPreferences.Editor editor = sharedPref.edit();
-        editor.putInt("valeur_y", valeur_y);
-        editor.apply();
-        setContentView(new GameView(this));
+        gameView = new GameView(this);
+        gameView.setOnTouchListener(this);
+        setContentView(gameView);
     }
+
+    @Override
+    public boolean onTouch(View v, MotionEvent event) {
+
+        int action = MotionEventCompat.getActionMasked(event);
+        switch (action) {
+            case (MotionEvent.ACTION_DOWN):
+                switch (gameView.direction) {
+                    case HAUT:
+                        gameView.direction = gameView.randomDirection(gameView.direction);
+                        break;
+                    case BAS:
+                        gameView.direction = gameView.randomDirection(gameView.direction);
+                        break;
+                    case DROITE:
+                        gameView.direction = gameView.randomDirection(gameView.direction);
+                        break;
+                    case GAUCHE:
+                        gameView.direction = gameView.randomDirection(gameView.direction);
+
+                        break;
+                }
+                break;
+        }
+        return true;
+    }
+
 }
