@@ -11,7 +11,6 @@ import android.hardware.SensorManager;
 import android.util.AttributeSet;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
-import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 
@@ -108,9 +107,8 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Sen
     private boolean isFinDujeu() {
         boolean fin = x + rayon > width || x - rayon < 0 || y - rayon < 0 || y + rayon > height;
         if (!dejaFini && fin) {
-            TextView tv = findViewById(R.id.textView2);
             int score = (int) (System.currentTimeMillis() / 1000 - debut);
-            tv.setText("Jeu terminé, votre score est " + score);
+            MainActivity.tv.setText("Jeu terminé, votre score est " + score);
             dejaFini = true;
         }
         return fin;

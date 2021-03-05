@@ -5,6 +5,11 @@
     android:layout_height="match_parent"
     tools:context=".MainActivity">
 
+    <com.m2dl.ballgame.GameView
+        android:id="@+id/surfaceView"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" />
+
     <TextView
         android:id="@+id/textView2"
         android:layout_width="match_parent"
@@ -14,10 +19,5 @@
         android:textColor="#000000"
         android:textSize="30sp"
         android:visibility="visible" />
-
-    <com.m2dl.ballgame.GameView
-        android:id="@+id/surfaceView"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent" />
 
 </FrameLayout>

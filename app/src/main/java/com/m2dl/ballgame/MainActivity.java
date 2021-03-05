@@ -13,11 +13,11 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
-
-import static java.lang.Thread.sleep;
+import android.widget.TextView;
 
 public class MainActivity extends Activity implements View.OnTouchListener, SensorEventListener {
     private GameView gameView;
+    static TextView tv;
 
     public static SharedPreferences sharedPreferences;
     public SharedPreferences.Editor editor;
@@ -45,6 +45,7 @@ public class MainActivity extends Activity implements View.OnTouchListener, Sens
         editor.apply();
 
         setContentView(R.layout.activity_main);
+        tv = findViewById(R.id.textView2);
         gameView = findViewById(R.id.surfaceView);
         gameView.setOnTouchListener(this);
     }
