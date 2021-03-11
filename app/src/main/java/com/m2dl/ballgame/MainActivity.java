@@ -79,8 +79,8 @@ public class MainActivity extends Activity implements View.OnTouchListener, Sens
 
     @Override
     protected void onStop() {
-        super.onStop();
         sensorManager.unregisterListener(this, light);
+        super.onStop();
     }
 
     @Override
