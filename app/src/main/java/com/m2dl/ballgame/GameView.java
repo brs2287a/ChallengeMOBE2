@@ -8,9 +8,11 @@ import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
+import android.os.Handler;
 import android.util.AttributeSet;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
+import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 
@@ -31,10 +33,21 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Sen
     private int actualSpeed = 1;
     private double acceleration = 0;
     private int rayon = 50;
+    private int score;
     private boolean dejaFini = false;
+    private Handler mHandler;
 
     private int background_color;
     private int ball_color;
+
+    // un Runnable qui sera appelé par le timer
+    private Runnable mUpdateTimeTask = new Runnable() {
+        public void run() {
+            score = (int) (System.currentTimeMillis() / 1000 - debut);
+            MainActivity.tvScore.setText("" + score);
+            mHandler.postDelayed(this, 1000);
+        }
+    };
 
     public GameView(Context context, AttributeSet attrs) {
         super(context, attrs);
@@ -54,6 +67,8 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Sen
         x = width / 2;
         y = height / 2;
         debut = System.currentTimeMillis() / 1000;
+        mHandler = new Handler();
+        mHandler.postDelayed(mUpdateTimeTask, 1000);
     }
 
     @Override
@@ -107,10 +122,14 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Sen
     private boolean isFinDujeu() {
         boolean fin = x + rayon > width || x - rayon < 0 || y - rayon < 0 || y + rayon > height;
         if (!dejaFini && fin) {
-            int score = (int) (System.currentTimeMillis() / 1000 - debut);
+            //int score = (int) (System.currentTimeMillis() / 1000 - debut);
             MainActivity.tv.setText("Jeu terminé, votre score est " + score);
+            MainActivity.tvScore.setVisibility(INVISIBLE);
+            MainActivity.replayButton.setVisibility(VISIBLE);
+            mHandler.removeCallbacks(mUpdateTimeTask);
             dejaFini = true;
         }
+
         return fin;
     }
 
