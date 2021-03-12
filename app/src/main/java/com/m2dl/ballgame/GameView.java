@@ -12,12 +12,12 @@ import android.os.Handler;
 import android.util.AttributeSet;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
-import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 
 import java.util.ArrayList;
 import java.util.Random;
+import java.util.UUID;
 
 public class GameView extends SurfaceView implements SurfaceHolder.Callback, SensorEventListener {
 
@@ -40,9 +40,10 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Sen
     private int background_color;
     private int ball_color;
 
-    private String pseudo = Accueil.sharedPreferences.getString("PlayerName", "");
+    private String pseudo = Accueil.sharedPreferences.getString("PlayerName", "Player 1");
+    private String guid = UUID.randomUUID().toString();
 
-    // un Runnable qui sera appelé par le timer
+            // un Runnable qui sera appelé par le timer
     private Runnable mUpdateTimeTask = new Runnable() {
         public void run() {
             score = (int) (System.currentTimeMillis() / 1000 - debut);
