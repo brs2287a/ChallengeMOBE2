@@ -17,7 +17,8 @@ public class Score extends AppCompatActivity implements TabLayout.OnTabSelectedL
 
     public static final int MYTOP = 1;
     public static final int TOP100 = 2;
-    private static final int NUM_PAGES = 2;
+    public static final int LOCALSCORES = 3;
+    private static final int NUM_PAGES = 3;
     // Access a Cloud Firestore instance from your Activity
     FirebaseFirestore db = FirebaseFirestore.getInstance();
     ViewPager2 viewPager;
@@ -65,11 +66,14 @@ public class Score extends AppCompatActivity implements TabLayout.OnTabSelectedL
 
         @Override
         public Fragment createFragment(int position) {
+            TabLayout tabLayout = findViewById(R.id.tabLayout);
             switch (position) {
-                case 0:
-                    return UserWorldScore.newInstance(MYTOP);
                 case 1:
+                    return UserWorldScore.newInstance(MYTOP);
+                case 2:
                     return UserWorldScore.newInstance(TOP100);
+                case 0:
+                    return UserWorldScore.newInstance(LOCALSCORES);
                 default:
                     return null;
             }

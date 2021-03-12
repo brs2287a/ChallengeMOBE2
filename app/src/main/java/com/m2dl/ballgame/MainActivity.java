@@ -1,7 +1,6 @@
 package com.m2dl.ballgame;
 
 import android.app.Activity;
-import android.content.Context;
 import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.hardware.Sensor;
@@ -16,12 +15,17 @@ import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.TextView;
 
+import com.google.firebase.firestore.FirebaseFirestore;
+
+import static android.view.View.INVISIBLE;
+import static android.view.View.VISIBLE;
+
 public class MainActivity extends Activity implements View.OnTouchListener, SensorEventListener, View.OnClickListener {
 
     private GameView gameView;
-    static TextView tv;
-    static TextView tvScore;
-    static Button replayButton;
+    private TextView tv;
+    private TextView tvScore;
+    private Button replayButton;
 
     public SharedPreferences.Editor editor;
 
@@ -30,6 +34,11 @@ public class MainActivity extends Activity implements View.OnTouchListener, Sens
 
     private int background_color = Color.WHITE;
     private int ball_color = Color.BLACK;
+
+    private String guid = Accueil.sharedPreferences.getString("GUID", Accueil.guidNotRetrieve());
+
+    // Access a Cloud Firestore instance from your Activity
+    private FirebaseFirestore db = FirebaseFirestore.getInstance();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -51,6 +60,7 @@ public class MainActivity extends Activity implements View.OnTouchListener, Sens
         replayButton = findViewById(R.id.replayButton);
         replayButton.setOnClickListener(this);
         gameView = findViewById(R.id.surfaceView);
+        gameView.setActivity(this);
         gameView.setOnTouchListener(this);
     }
 
@@ -124,5 +134,22 @@ public class MainActivity extends Activity implements View.OnTouchListener, Sens
     public void onClick(View v) {
         finish();
         startActivity(getIntent());
+    }
+
+    public void showFin(Integer score, String pseudo) {
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                String texte = pseudo + " votre score final est " + score;
+                tv.setText(texte);
+                tvScore.setVisibility(INVISIBLE);
+                replayButton.setVisibility(VISIBLE);
+            }
+        });
+    }
+
+
+    public void setTextTv(String s) {
+        tv.setText(s);
     }
 }

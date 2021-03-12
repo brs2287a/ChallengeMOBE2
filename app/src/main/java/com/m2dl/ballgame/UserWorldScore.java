@@ -1,10 +1,12 @@
 package com.m2dl.ballgame;
 
+import android.graphics.Color;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ProgressBar;
 import android.widget.TableLayout;
 import android.widget.TableRow;
 import android.widget.TextView;
@@ -14,12 +16,14 @@ import androidx.fragment.app.Fragment;
 
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
+import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.Query;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
 
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 
 import static android.content.ContentValues.TAG;
@@ -39,6 +43,9 @@ public class UserWorldScore extends Fragment {
     private ArrayList<String> data;
     private int viewType;
     private FirebaseFirestore db = FirebaseFirestore.getInstance();
+
+    private String guid = Accueil.sharedPreferences.getString("GUID", Accueil.guidNotRetrieve());
+    private int userPos;
 
     public UserWorldScore() {
         // Required empty public constructor
@@ -71,8 +78,18 @@ public class UserWorldScore extends Fragment {
 
 
     private void init(View v) {
+        userPos = -1;
         data = new ArrayList<>();
+        ProgressBar pb = v.findViewById(R.id.progressBar_cyclic);
+        pb.setVisibility(View.VISIBLE);
         switch (viewType) {
+            case Score.LOCALSCORES:
+                List<Integer> scores = Accueil.loadArray(getContext().getApplicationContext());
+                for (int i = 0; i < scores.size(); ++i) {
+                    data.add("TOP " + (i + 1) + ": " + scores.get(i));
+                }
+                inflate(v, data);
+                break;
             case Score.TOP100:
                 db.collection("score").orderBy("score", Query.Direction.DESCENDING).limit(100)
                         .get()
@@ -81,10 +98,7 @@ public class UserWorldScore extends Fragment {
                             public void onComplete(@NonNull Task<QuerySnapshot> task) {
                                 if (task.isSuccessful()) {
                                     for (QueryDocumentSnapshot document : task.getResult()) {
-                                        Map<String, Object> doc = document.getData();
-                                        String str = "";
-                                        str += doc.get("user") + " : " + doc.get("score");
-                                        data.add(str);
+                                        data.add(getStringFromDoc(document));
                                         Log.d(TAG, document.getId() + " => " + document.getData());
                                     }
                                     inflate(v, data);
@@ -95,40 +109,91 @@ public class UserWorldScore extends Fragment {
                         });
                 break;
             case Score.MYTOP:
-                db.collection("score").orderBy("score", Query.Direction.DESCENDING).limit(100)
-                        .get()
-                        .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
-                            @Override
-                            public void onComplete(@NonNull Task<QuerySnapshot> task) {
-                                if (task.isSuccessful()) {
-                                    for (QueryDocumentSnapshot document : task.getResult()) {
-                                        Map<String, Object> doc = document.getData();
-                                        String str = "";
-                                        str += doc.get("user") + " : " + doc.get("score");
-                                        data.add(str);
-                                        Log.d(TAG, document.getId() + " => " + document.getData());
-                                    }
-                                    inflate(v, data);
-                                } else {
-                                    Log.d(TAG, "Error getting documents: ", task.getException());
-                                }
+                //highscore du user
+                db.collection("score").document(guid).get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+                    @Override
+                    public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+                        if (task.isSuccessful()) {
+                            DocumentSnapshot document = task.getResult();
+                            if (document.exists()) {
+                                //les 50 scores au dessus
+                                db.collection("score").orderBy("score", Query.Direction.DESCENDING).limitToLast(50).endAt(document).get()
+                                        .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+                                            @Override
+                                            public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                                                if (task.isSuccessful()) {
+                                                    for (QueryDocumentSnapshot document : task.getResult()) {
+                                                        data.add(getStringFromDoc(document));
+                                                        Log.d(TAG, document.getId() + " => " + document.getData());
+                                                    }
+                                                    userPos = data.size() - 1;
+                                                    //les 50 scores en dessous
+                                                    db.collection("score").orderBy("score", Query.Direction.DESCENDING).limit(50).startAfter(document)
+                                                            .get()
+                                                            .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+                                                                @Override
+                                                                public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                                                                    if (task.isSuccessful()) {
+                                                                        for (QueryDocumentSnapshot document : task.getResult()) {
+                                                                            data.add(getStringFromDoc(document));
+                                                                            Log.d(TAG, document.getId() + " => " + document.getData());
+                                                                        }
+                                                                        inflate(v, data);
+                                                                    } else {
+                                                                        Log.d(TAG, "Error getting documents: ", task.getException());
+                                                                    }
+                                                                }
+                                                            });
+                                                } else {
+                                                    Log.d(TAG, "Error getting documents: ", task.getException());
+                                                }
+                                            }
+                                        });
+                                Log.d(TAG, "DocumentSnapshot data: " + document.getData());
+                            } else {
+                                Log.d(TAG, "No such document");
                             }
-                        });
+                        } else {
+                            Log.d(TAG, "get failed with ", task.getException());
+                        }
+                    }
+                });
                 break;
         }
 
     }
 
+    private String getStringFromDoc(QueryDocumentSnapshot document) {
+        Map<String, Object> doc = document.getData();
+        String str = "";
+        str += doc.get("user") + " : " + doc.get("score");
+        return str;
+    }
+
     private void inflate(View v, ArrayList<String> data) {
         TableLayout table = (TableLayout) v.findViewById(R.id.table_user_score);
         if (data != null) {
-            for (String line : data) {
+            for (int i = 0; i < data.size(); ++i) {
                 final TableRow tr = (TableRow) getLayoutInflater().inflate(R.layout.item_score, null);
                 TextView tvTitre = (TextView) tr.findViewById(R.id.tvContenu);
-                tvTitre.setText(line);
+                tvTitre.setText(data.get(i));
+                if (i == userPos) {
+                    tr.setBackgroundColor(Color.parseColor("#FAE37B"));
+                }
+                if ((viewType == Score.TOP100 || viewType == Score.LOCALSCORES) && i == 0) {
+                    tr.setBackgroundColor(Color.parseColor("#FAE37B"));
+                }
+                if ((viewType == Score.TOP100 || viewType == Score.LOCALSCORES) && i == 1) {
+                    tr.setBackgroundColor(Color.parseColor("#BDBDBD"));
+                }
+                if ((viewType == Score.TOP100 || viewType == Score.LOCALSCORES) && i == 2) {
+                    tr.setBackgroundColor(Color.parseColor("#FA9541"));
+                }
                 table.addView(tr);
             }
         }
+        ProgressBar pb = v.findViewById(R.id.progressBar_cyclic);
+        pb.setVisibility(View.GONE);
     }
 
 

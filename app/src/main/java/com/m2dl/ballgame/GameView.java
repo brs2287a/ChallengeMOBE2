@@ -20,14 +20,12 @@ import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.firestore.FirebaseFirestore;
 
-import com.google.firebase.firestore.FirebaseFirestore;
-
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Random;
-import java.util.UUID;
 
 import static android.content.ContentValues.TAG;
 
@@ -45,7 +43,7 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Sen
     private int actualSpeed = 1;
     private double acceleration = 0;
     private int rayon = 50;
-    private double score;
+    private int score;
     private boolean dejaFini = false;
     private Handler mHandler;
 
@@ -55,18 +53,15 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Sen
     // Access a Cloud Firestore instance from your Activity
     private FirebaseFirestore db = FirebaseFirestore.getInstance();
 
-
     private String pseudo = Accueil.sharedPreferences.getString("PlayerName", "Player 1");
     private String guid = Accueil.sharedPreferences.getString("GUID", Accueil.guidNotRetrieve());
-
-
-
-            // un Runnable qui sera appelé par le timer
+    private MainActivity activity;
+    // un Runnable qui sera appelé par le timer
     private Runnable mUpdateTimeTask = new Runnable() {
         public void run() {
-            score = (double) (System.currentTimeMillis() / 1000 - debut);
-            MainActivity.tvScore.setText("" + score);
-            mHandler.postDelayed(this, 1000);
+            score = (int) (System.currentTimeMillis() / 100 - debut);
+            activity.setTextTv("" + score);
+            mHandler.postDelayed(this, 100);
         }
     };
 
@@ -87,9 +82,9 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Sen
         height = this.getResources().getDisplayMetrics().heightPixels;
         x = width / 2;
         y = height / 2;
-        debut = System.currentTimeMillis() / 1000;
+        debut = System.currentTimeMillis() / 100;
         mHandler = new Handler();
-        mHandler.postDelayed(mUpdateTimeTask, 1000);
+        mHandler.postDelayed(mUpdateTimeTask, 100);
     }
 
     @Override
@@ -145,17 +140,13 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Sen
         if (!dejaFini && fin) {
             dejaFini = true;
             mHandler.removeCallbacks(mUpdateTimeTask);
-            //int score = (int) (System.currentTimeMillis() / 1000 - debut);
-            String texte = pseudo + " votre score final est " + score;
-            System.out.println("VOILA LE GUID ==> " + guid);
-            MainActivity.tv.setText(texte);
-            MainActivity.tvScore.setVisibility(INVISIBLE);
-            MainActivity.replayButton.setVisibility(VISIBLE);
-            sendScore(score);
+            activity.showFin(score, pseudo);
+            registerScore(score, pseudo);
         }
 
         return fin;
     }
+
 
     @Override
     public void draw(Canvas canvas) {
@@ -291,15 +282,33 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Sen
         this.actualSpeed = actualSpeed;
     }
 
-    private void sendScore(double score) {
-        Random r = new Random();
+    public void setActivity(MainActivity mainActivity) {
+        this.activity = mainActivity;
+    }
+
+    private void registerScore(int score, String pseudo) {
+        List<Integer> scores = Accueil.loadArray(getContext().getApplicationContext());
+        if (scores.isEmpty() || scores.get(0) < score) {
+            sendScore(score, pseudo);
+        }
+        int lastIndex = scores.size() - 1;
+        if (scores.size() < Accueil.SIZE_HIGHSCORE || score > scores.get(lastIndex)) {
+            if (!scores.isEmpty()) {
+                scores.remove(lastIndex);
+            }
+            scores.add(score);
+            Accueil.saveArray(scores, getContext().getApplicationContext());
+        }
+    }
+
+    private void sendScore(Integer score, String pseudo) {
         Map<String, Object> scoreEnregistrement = new HashMap<>();
 
         scoreEnregistrement.put("date", new Date());
         scoreEnregistrement.put("score", score);
-        scoreEnregistrement.put("user", "root" + r.nextInt(10000000));
+        scoreEnregistrement.put("user", pseudo);
 
-        db.collection("score").document("scoreTab")
+        db.collection("score").document(guid)
                 .set(scoreEnregistrement)
                 .addOnSuccessListener(new OnSuccessListener<Void>() {
                     @Override

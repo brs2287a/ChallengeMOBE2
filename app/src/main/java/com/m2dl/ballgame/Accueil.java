@@ -9,15 +9,19 @@ import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
 import android.widget.Button;
-import android.widget.TextView;
 import android.widget.EditText;
+import android.widget.TextView;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 import java.util.UUID;
 
 
 public class Accueil extends Activity {
 
     public static SharedPreferences sharedPreferences;
+    public static int SIZE_HIGHSCORE = 10;
     public SharedPreferences.Editor editor;
 
     private EditText player_name;
@@ -72,5 +76,24 @@ public class Accueil extends Activity {
     public void seeScore(View view) {
         Intent intent = new Intent(this, Score.class);
         startActivity(intent);
+    }
+
+    public static boolean saveArray(List<Integer> list, Context mContext) {
+        SharedPreferences prefs = mContext.getSharedPreferences("local", 0);
+        SharedPreferences.Editor editor = prefs.edit();
+        editor.putInt("scores" + "_size", list.size());
+        for (int i = 0; i < list.size(); i++)
+            editor.putInt("scores" + "_" + i, list.get(i));
+        return editor.commit();
+    }
+
+    public static List<Integer> loadArray(Context mContext) {
+        SharedPreferences prefs = mContext.getSharedPreferences("local", 0);
+        int size = prefs.getInt("scores" + "_size", 0);
+        List<Integer> list = new ArrayList<>();
+        for (int i = 0; i < size; i++)
+            list.add(prefs.getInt("scores" + "_" + i, -1));
+        Collections.sort(list, Collections.reverseOrder());
+        return list;
     }
 }
