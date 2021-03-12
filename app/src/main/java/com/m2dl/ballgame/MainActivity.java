@@ -13,13 +13,16 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
+import android.widget.Button;
 import android.widget.TextView;
 
-public class MainActivity extends Activity implements View.OnTouchListener, SensorEventListener {
+public class MainActivity extends Activity implements View.OnTouchListener, SensorEventListener, View.OnClickListener {
+
     private GameView gameView;
     static TextView tv;
+    static TextView tvScore;
+    static Button replayButton;
 
-    public static SharedPreferences sharedPreferences;
     public SharedPreferences.Editor editor;
 
     private SensorManager sensorManager = null;
@@ -27,7 +30,6 @@ public class MainActivity extends Activity implements View.OnTouchListener, Sens
 
     private int background_color = Color.WHITE;
     private int ball_color = Color.BLACK;
-
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -38,14 +40,16 @@ public class MainActivity extends Activity implements View.OnTouchListener, Sens
 
         sensorManager = (SensorManager) getSystemService(SENSOR_SERVICE);
         light = sensorManager.getDefaultSensor(Sensor.TYPE_LIGHT);
-        sharedPreferences = this.getPreferences(Context.MODE_PRIVATE);
-        editor = sharedPreferences.edit();
+        editor = Accueil.sharedPreferences.edit();
         editor.putInt("BackgroundColor", background_color);
         editor.putInt("BallColor", ball_color);
         editor.apply();
 
         setContentView(R.layout.activity_main);
         tv = findViewById(R.id.textView2);
+        tvScore = findViewById(R.id.textViewScore);
+        replayButton = findViewById(R.id.replayButton);
+        replayButton.setOnClickListener(this);
         gameView = findViewById(R.id.surfaceView);
         gameView.setOnTouchListener(this);
     }
@@ -116,4 +120,9 @@ public class MainActivity extends Activity implements View.OnTouchListener, Sens
         }
     }
 
+    @Override
+    public void onClick(View v) {
+        finish();
+        startActivity(getIntent());
+    }
 }

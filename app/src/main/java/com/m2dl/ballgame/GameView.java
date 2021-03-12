@@ -8,6 +8,7 @@ import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
+import android.os.Handler;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.view.SurfaceHolder;
@@ -19,11 +20,14 @@ import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.firestore.FirebaseFirestore;
 
+import com.google.firebase.firestore.FirebaseFirestore;
+
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Random;
+import java.util.UUID;
 
 import static android.content.ContentValues.TAG;
 
@@ -41,7 +45,9 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Sen
     private int actualSpeed = 1;
     private double acceleration = 0;
     private int rayon = 50;
+    private double score;
     private boolean dejaFini = false;
+    private Handler mHandler;
 
     private int background_color;
     private int ball_color;
@@ -49,14 +55,29 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Sen
     // Access a Cloud Firestore instance from your Activity
     private FirebaseFirestore db = FirebaseFirestore.getInstance();
 
+
+    private String pseudo = Accueil.sharedPreferences.getString("PlayerName", "Player 1");
+    private String guid = Accueil.sharedPreferences.getString("GUID", Accueil.guidNotRetrieve());
+
+
+
+            // un Runnable qui sera appelé par le timer
+    private Runnable mUpdateTimeTask = new Runnable() {
+        public void run() {
+            score = (double) (System.currentTimeMillis() / 1000 - debut);
+            MainActivity.tvScore.setText("" + score);
+            mHandler.postDelayed(this, 1000);
+        }
+    };
+
     public GameView(Context context, AttributeSet attrs) {
         super(context, attrs);
         getHolder().addCallback(this);
         setFocusable(true);
         direction = randomDirection();
 
-        background_color = MainActivity.sharedPreferences.getInt("BackgroundColor", Color.BLACK);
-        ball_color = MainActivity.sharedPreferences.getInt("BallColor", Color.WHITE);
+        background_color = Accueil.sharedPreferences.getInt("BackgroundColor", Color.BLACK);
+        ball_color = Accueil.sharedPreferences.getInt("BallColor", Color.WHITE);
 
         thread = new GameThread(getHolder(), this);
         sensorManager = (SensorManager) context.getSystemService(Context.SENSOR_SERVICE);
@@ -67,6 +88,8 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Sen
         x = width / 2;
         y = height / 2;
         debut = System.currentTimeMillis() / 1000;
+        mHandler = new Handler();
+        mHandler.postDelayed(mUpdateTimeTask, 1000);
     }
 
     @Override
@@ -95,8 +118,8 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Sen
     }
 
     public void update() {
-        background_color = MainActivity.sharedPreferences.getInt("BackgroundColor", Color.BLACK);
-        ball_color = MainActivity.sharedPreferences.getInt("BallColor", Color.WHITE);
+        background_color = Accueil.sharedPreferences.getInt("BackgroundColor", Color.BLACK);
+        ball_color = Accueil.sharedPreferences.getInt("BallColor", Color.WHITE);
 
         if (!isFinDujeu()) {
             switch (direction) {
@@ -121,10 +144,16 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Sen
         boolean fin = x + rayon > width || x - rayon < 0 || y - rayon < 0 || y + rayon > height;
         if (!dejaFini && fin) {
             dejaFini = true;
-            double score = (double) (System.currentTimeMillis() / 1000 - debut);
-            MainActivity.tv.setText("Jeu terminé, votre score est " + score);
+            mHandler.removeCallbacks(mUpdateTimeTask);
+            //int score = (int) (System.currentTimeMillis() / 1000 - debut);
+            String texte = pseudo + " votre score final est " + score;
+            System.out.println("VOILA LE GUID ==> " + guid);
+            MainActivity.tv.setText(texte);
+            MainActivity.tvScore.setVisibility(INVISIBLE);
+            MainActivity.replayButton.setVisibility(VISIBLE);
             sendScore(score);
         }
+
         return fin;
     }
 
@@ -138,7 +167,6 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Sen
             canvas.drawCircle(x, y, rayon,  paint);
         }
     }
-
 
 
     public static Direction randomDirection()  {
