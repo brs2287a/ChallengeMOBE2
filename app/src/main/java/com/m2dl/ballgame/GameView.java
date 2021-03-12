@@ -9,13 +9,23 @@ import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 
 import androidx.annotation.NonNull;
 
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.firebase.firestore.FirebaseFirestore;
+
 import java.util.ArrayList;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Random;
+
+import static android.content.ContentValues.TAG;
 
 public class GameView extends SurfaceView implements SurfaceHolder.Callback, SensorEventListener {
 
@@ -35,6 +45,9 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Sen
 
     private int background_color;
     private int ball_color;
+
+    // Access a Cloud Firestore instance from your Activity
+    private FirebaseFirestore db = FirebaseFirestore.getInstance();
 
     public GameView(Context context, AttributeSet attrs) {
         super(context, attrs);
@@ -107,9 +120,10 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Sen
     private boolean isFinDujeu() {
         boolean fin = x + rayon > width || x - rayon < 0 || y - rayon < 0 || y + rayon > height;
         if (!dejaFini && fin) {
-            int score = (int) (System.currentTimeMillis() / 1000 - debut);
-            MainActivity.tv.setText("Jeu terminé, votre score est " + score);
             dejaFini = true;
+            double score = (double) (System.currentTimeMillis() / 1000 - debut);
+            MainActivity.tv.setText("Jeu terminé, votre score est " + score);
+            sendScore(score);
         }
         return fin;
     }
@@ -247,5 +261,29 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Sen
 
     public void setActualSpeed(int actualSpeed) {
         this.actualSpeed = actualSpeed;
+    }
+
+    private void sendScore(double score) {
+        Random r = new Random();
+        Map<String, Object> scoreEnregistrement = new HashMap<>();
+
+        scoreEnregistrement.put("date", new Date());
+        scoreEnregistrement.put("score", score);
+        scoreEnregistrement.put("user", "root" + r.nextInt(10000000));
+
+        db.collection("score").document("scoreTab")
+                .set(scoreEnregistrement)
+                .addOnSuccessListener(new OnSuccessListener<Void>() {
+                    @Override
+                    public void onSuccess(Void aVoid) {
+                        Log.d(TAG, "DocumentSnapshot successfully written!");
+                    }
+                })
+                .addOnFailureListener(new OnFailureListener() {
+                    @Override
+                    public void onFailure(@NonNull Exception e) {
+                        Log.w(TAG, "Error writing document", e);
+                    }
+                });
     }
 }
