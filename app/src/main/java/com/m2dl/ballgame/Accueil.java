@@ -4,7 +4,9 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.os.Build;
 import android.os.Bundle;
+import android.provider.Settings;
 import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
@@ -25,6 +27,7 @@ public class Accueil extends Activity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+
         super.onCreate(savedInstanceState);
         getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,
                 WindowManager.LayoutParams.FLAG_FULLSCREEN);
@@ -35,10 +38,6 @@ public class Accueil extends Activity {
         player_name = findViewById(R.id.player_name);
         player_name.setVisibility(View.VISIBLE);
 
-        editor = sharedPreferences.edit();
-        editor.putString("PlayerName", player_name.getText().toString());
-        editor.apply();
-
         name = findViewById(R.id.game_name);
         name.setVisibility(View.VISIBLE);
         play = findViewById(R.id.play_button);
@@ -48,6 +47,14 @@ public class Accueil extends Activity {
     }
 
     public void startGame(View view) {
+        System.out.println(player_name.getText());
+        System.out.println(player_name.getText().toString());
+
+        editor = sharedPreferences.edit();
+        editor.putString("PlayerName", player_name.getText().toString());
+        editor.apply();
+
+        System.out.println(sharedPreferences.getString("PlayerName", "coucou"));
         Intent intent = new Intent(this, MainActivity.class);
         startActivity(intent);
     }

@@ -40,6 +40,8 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Sen
     private int background_color;
     private int ball_color;
 
+    private String pseudo = Accueil.sharedPreferences.getString("PlayerName", "");
+
     // un Runnable qui sera appelé par le timer
     private Runnable mUpdateTimeTask = new Runnable() {
         public void run() {
@@ -55,8 +57,8 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Sen
         setFocusable(true);
         direction = randomDirection();
 
-        background_color = MainActivity.sharedPreferences.getInt("BackgroundColor", Color.BLACK);
-        ball_color = MainActivity.sharedPreferences.getInt("BallColor", Color.WHITE);
+        background_color = Accueil.sharedPreferences.getInt("BackgroundColor", Color.BLACK);
+        ball_color = Accueil.sharedPreferences.getInt("BallColor", Color.WHITE);
 
         thread = new GameThread(getHolder(), this);
         sensorManager = (SensorManager) context.getSystemService(Context.SENSOR_SERVICE);
@@ -97,8 +99,8 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Sen
     }
 
     public void update() {
-        background_color = MainActivity.sharedPreferences.getInt("BackgroundColor", Color.BLACK);
-        ball_color = MainActivity.sharedPreferences.getInt("BallColor", Color.WHITE);
+        background_color = Accueil.sharedPreferences.getInt("BackgroundColor", Color.BLACK);
+        ball_color = Accueil.sharedPreferences.getInt("BallColor", Color.WHITE);
 
         if (!isFinDujeu()) {
             switch (direction) {
@@ -123,7 +125,8 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Sen
         boolean fin = x + rayon > width || x - rayon < 0 || y - rayon < 0 || y + rayon > height;
         if (!dejaFini && fin) {
             //int score = (int) (System.currentTimeMillis() / 1000 - debut);
-            MainActivity.tv.setText("Jeu terminé, votre score est " + score);
+            String texte = pseudo + " votre score final est " + score;
+            MainActivity.tv.setText(texte);
             MainActivity.tvScore.setVisibility(INVISIBLE);
             MainActivity.replayButton.setVisibility(VISIBLE);
             mHandler.removeCallbacks(mUpdateTimeTask);
@@ -143,7 +146,6 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Sen
             canvas.drawCircle(x, y, rayon,  paint);
         }
     }
-
 
 
     public static Direction randomDirection()  {
