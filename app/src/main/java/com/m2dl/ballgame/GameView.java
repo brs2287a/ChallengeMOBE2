@@ -41,7 +41,9 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Sen
     private int ball_color;
 
     private String pseudo = Accueil.sharedPreferences.getString("PlayerName", "Player 1");
-    private String guid = UUID.randomUUID().toString();
+    private String guid = Accueil.sharedPreferences.getString("GUID", Accueil.guidNotRetrieve());
+
+
 
             // un Runnable qui sera appelé par le timer
     private Runnable mUpdateTimeTask = new Runnable() {
@@ -127,6 +129,7 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Sen
         if (!dejaFini && fin) {
             //int score = (int) (System.currentTimeMillis() / 1000 - debut);
             String texte = pseudo + " votre score final est " + score;
+            System.out.println("VOILA LE GUID ==> " + guid);
             MainActivity.tv.setText(texte);
             MainActivity.tvScore.setVisibility(INVISIBLE);
             MainActivity.replayButton.setVisibility(VISIBLE);

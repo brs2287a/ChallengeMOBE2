@@ -12,6 +12,8 @@ import android.widget.Button;
 import android.widget.TextView;
 import android.widget.EditText;
 
+import java.util.UUID;
+
 
 public class Accueil extends Activity {
 
@@ -22,6 +24,17 @@ public class Accueil extends Activity {
     private TextView name;
     private Button play;
     private Button score;
+
+    private String guid;
+
+    protected static String guidNotRetrieve(){
+        String storedGuid = Accueil.sharedPreferences.getString("GUID", "");
+        if(storedGuid.equals("")){
+            storedGuid = UUID.randomUUID().toString();
+            sharedPreferences.edit().putString("GUID", storedGuid).apply();
+        }
+        return storedGuid;
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -42,11 +55,14 @@ public class Accueil extends Activity {
         play.setVisibility(View.VISIBLE);
         score = findViewById(R.id.score_button);
         score.setVisibility(View.VISIBLE);
+
+        guid = sharedPreferences.getString("GUID", guidNotRetrieve());
     }
 
     public void startGame(View view) {
         editor = sharedPreferences.edit();
         editor.putString("PlayerName", player_name.getText().toString());
+        editor.putString("GUID", guid);
         editor.apply();
 
         Intent intent = new Intent(this, MainActivity.class);
