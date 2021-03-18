@@ -1,6 +1,8 @@
 package com.m2dl.ballgame;
 
+import android.content.Intent;
 import android.os.Bundle;
+import android.view.View;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
@@ -35,13 +37,28 @@ public class Score extends AppCompatActivity implements TabLayout.OnTabSelectedL
         TabLayout tabLayout = findViewById(R.id.tabLayout);
         tabLayout.addOnTabSelectedListener(this);
         pagerAdapter = new ScreenSlidePagerAdapter(this);
+        viewPager.registerOnPageChangeCallback(new ViewPager2.OnPageChangeCallback() {
+            @Override
+            public void onPageSelected(int position) {
+                tabLayout.selectTab(tabLayout.getTabAt(position));
+            }
+        });
         viewPager.setAdapter(pagerAdapter);
 
+
     }
 
 
-    private void init() {
+    public void startGame(View view) {
+        Intent intent = new Intent(this, MainActivity.class);
+        startActivity(intent);
     }
+
+    public void accueil(View view) {
+        Intent intent = new Intent(this, Accueil.class);
+        startActivity(intent);
+    }
+
 
     @Override
     public void onTabSelected(TabLayout.Tab tab) {
@@ -57,6 +74,7 @@ public class Score extends AppCompatActivity implements TabLayout.OnTabSelectedL
     public void onTabReselected(TabLayout.Tab tab) {
 
     }
+
 
     private class ScreenSlidePagerAdapter extends FragmentStateAdapter {
         public ScreenSlidePagerAdapter(FragmentActivity fa) {

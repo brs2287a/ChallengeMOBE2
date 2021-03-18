@@ -292,10 +292,11 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Sen
             sendScore(score, pseudo);
         }
         int lastIndex = scores.size() - 1;
-        if (scores.size() < Accueil.SIZE_HIGHSCORE || score > scores.get(lastIndex)) {
-            if (!scores.isEmpty()) {
-                scores.remove(lastIndex);
-            }
+        if (scores.size() < Accueil.SIZE_HIGHSCORE) {
+            scores.add(score);
+            Accueil.saveArray(scores, getContext().getApplicationContext());
+        } else if (!scores.isEmpty() && score > scores.get(lastIndex)) {
+            scores.remove(lastIndex);
             scores.add(score);
             Accueil.saveArray(scores, getContext().getApplicationContext());
         }
