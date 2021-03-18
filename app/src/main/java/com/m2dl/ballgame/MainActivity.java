@@ -1,6 +1,7 @@
 package com.m2dl.ballgame;
 
 import android.app.Activity;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.hardware.Sensor;
@@ -20,12 +21,14 @@ import com.google.firebase.firestore.FirebaseFirestore;
 import static android.view.View.INVISIBLE;
 import static android.view.View.VISIBLE;
 
-public class MainActivity extends Activity implements View.OnTouchListener, SensorEventListener, View.OnClickListener {
+public class MainActivity extends Activity implements View.OnTouchListener, SensorEventListener {
 
     private GameView gameView;
     private TextView tv;
     private TextView tvScore;
     private Button replayButton;
+    private Button scoreButton;
+    private Button homeButton;
 
     public SharedPreferences.Editor editor;
 
@@ -58,7 +61,8 @@ public class MainActivity extends Activity implements View.OnTouchListener, Sens
         tv = findViewById(R.id.textView2);
         tvScore = findViewById(R.id.textViewScore);
         replayButton = findViewById(R.id.replayButton);
-        replayButton.setOnClickListener(this);
+        homeButton = findViewById(R.id.homeButton);
+        scoreButton = findViewById(R.id.scoreButton);
         gameView = findViewById(R.id.surfaceView);
         gameView.setActivity(this);
         gameView.setOnTouchListener(this);
@@ -130,10 +134,20 @@ public class MainActivity extends Activity implements View.OnTouchListener, Sens
         }
     }
 
-    @Override
-    public void onClick(View v) {
+    public void replay(View v) {
         finish();
         startActivity(getIntent());
+    }
+
+    public void seeScoreFromGame(View v) {
+        Intent intent = new Intent(this, Score.class);
+        startActivity(intent);
+        finish();
+    }
+    public void seeHome(View v) {
+        Intent intent = new Intent(this, Accueil.class);
+        startActivity(intent);
+        finish();
     }
 
     public void showFin(Integer score, String pseudo) {
@@ -144,6 +158,8 @@ public class MainActivity extends Activity implements View.OnTouchListener, Sens
                 tv.setText(texte);
                 tvScore.setVisibility(INVISIBLE);
                 replayButton.setVisibility(VISIBLE);
+                scoreButton.setVisibility(VISIBLE);
+                homeButton.setVisibility(VISIBLE);
             }
         });
     }

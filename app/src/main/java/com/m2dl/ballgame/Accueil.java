@@ -64,18 +64,24 @@ public class Accueil extends Activity {
     }
 
     public void startGame(View view) {
+        String pseudo = player_name.getText().toString();
+        if (pseudo.equals("")) {
+            pseudo = "Player 1";
+        }
         editor = sharedPreferences.edit();
-        editor.putString("PlayerName", player_name.getText().toString());
+        editor.putString("PlayerName", pseudo);
         editor.putString("GUID", guid);
         editor.apply();
 
         Intent intent = new Intent(this, MainActivity.class);
         startActivity(intent);
+        finish();
     }
 
     public void seeScore(View view) {
         Intent intent = new Intent(this, Score.class);
         startActivity(intent);
+        finish();
     }
 
     public static boolean saveArray(List<Integer> list, Context mContext) {
