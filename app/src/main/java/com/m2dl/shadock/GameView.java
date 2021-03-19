@@ -34,7 +34,7 @@ import static android.content.ContentValues.TAG;
 
 public class GameView extends SurfaceView implements SurfaceHolder.Callback, SensorEventListener {
 
-    private static final int HAUTEUR_LIGNE_VIDE = 350;
+    private static final int HAUTEUR_LIGNE_VIDE = 500;
     private static long SPEED = 300;
     private final Sensor sensor;
     private final int width;
@@ -76,6 +76,7 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Sen
     private final Drawable shadokPumpOne;
     private final Drawable shadokPumpTwo;
     private final Drawable shadokTired;
+    private final Drawable fuseeGibi;
 
     private boolean pump = true;
     private boolean rythm = true;
@@ -171,6 +172,7 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Sen
         shadokPumpOne = ResourcesCompat.getDrawable(getResources(), R.drawable.pump_way_one, null);
         shadokPumpTwo = ResourcesCompat.getDrawable(getResources(), R.drawable.pump_way_two, null);
         shadokTired = ResourcesCompat.getDrawable(getResources(), R.drawable.tiringpump, null);
+        fuseeGibi = ResourcesCompat.getDrawable(getResources(), R.drawable.fusee_gibi, null);
 
     }
 
@@ -336,7 +338,9 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Sen
         Paint paint = new Paint();
         paint.setColor(Color.rgb(0, 0, 255));
         for (Ennemy e : ennemies) {
-            canvas.drawCircle(e.getX(), e.getY(), rayon, paint);
+            fuseeGibi.setBounds(new Rect(e.getX(), e.getY(), e.getX() + 125, e.getY() + 200));
+            fuseeGibi.draw(canvas);
+            //canvas.drawCircle(e.getX(), e.getY(), rayon, paint);
         }
     }
 
