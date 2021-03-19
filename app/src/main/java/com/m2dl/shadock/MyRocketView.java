@@ -4,11 +4,12 @@ import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
+import android.graphics.Rect;
 import android.view.View;
 
 public class MyRocketView extends View {
 
-    private Bitmap rocketBitmap;
+    private final Bitmap rocketBitmap;
     float x = 0.0f;
     float y = 0.0f;
 
@@ -21,6 +22,7 @@ public class MyRocketView extends View {
     @Override
     protected void onDraw(Canvas canvas) {
         super.onDraw(canvas);
+        Rect imageBounds = canvas.getClipBounds();
         canvas.drawBitmap(rocketBitmap,  x, y, null);
     }
 }

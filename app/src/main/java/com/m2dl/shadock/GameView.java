@@ -4,6 +4,8 @@ import android.content.Context;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
+import android.graphics.Rect;
+import android.graphics.drawable.Drawable;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
@@ -15,7 +17,7 @@ import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 
 import androidx.annotation.NonNull;
-import androidx.constraintlayout.solver.widgets.Rectangle;
+import androidx.core.content.res.ResourcesCompat;
 
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
@@ -36,31 +38,32 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Sen
     private final int width;
     private final int height;
     private final long debut;
-    private GameThread thread;
+    private final GameThread thread;
     private int x;
     private int y;
     private Direction direction;
-    private SensorManager sensorManager;
+    private final SensorManager sensorManager;
     private int actualSpeed = 1;
     private double acceleration = 0;
-    private int rayon = 50;
+    private final int rayon = 50;
     private int score;
     private boolean dejaFini = false;
-    private Handler mHandler;
+    private final Handler mHandler;
 
     private int background_color;
     private int ball_color;
+    private final Drawable mCustomImage;
 
     private MyRocketView rocketView;
 
     // Access a Cloud Firestore instance from your Activity
-    private FirebaseFirestore db = FirebaseFirestore.getInstance();
+    private final FirebaseFirestore db = FirebaseFirestore.getInstance();
 
-    private String pseudo = Accueil.sharedPreferences.getString("PlayerName", "Player 1");
-    private String guid = Accueil.sharedPreferences.getString("GUID", Accueil.guidNotRetrieve());
+    private final String pseudo = Accueil.sharedPreferences.getString("PlayerName", "Player 1");
+    private final String guid = Accueil.sharedPreferences.getString("GUID", Accueil.guidNotRetrieve());
     private MainActivity activity;
     // un Runnable qui sera appelé par le timer
-    private Runnable mUpdateTimeTask = new Runnable() {
+    private final Runnable mUpdateTimeTask = new Runnable() {
         public void run() {
             score = (int) (System.currentTimeMillis() / 100 - debut);
             activity.setTextTv("" + score);
@@ -88,6 +91,7 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Sen
         debut = System.currentTimeMillis() / 100;
         mHandler = new Handler();
         mHandler.postDelayed(mUpdateTimeTask, 100);
+        mCustomImage = ResourcesCompat.getDrawable(getResources(), R.drawable.fusee_shadocks_resized, null);
     }
 
     @Override
@@ -157,9 +161,11 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Sen
             canvas.drawColor(this.background_color);
             Paint paint = new Paint();
             paint.setColor(this.ball_color);
-            canvas.drawCircle(x, y, rayon,  paint);
+            //canvas.drawCircle(x, y, rayon,  paint);
+            mCustomImage.setBounds(new Rect(x - 50, y - 75, x + 50, y + 75));
+            mCustomImage.draw(canvas);
 
-            this.rocketView.draw(canvas);
+            //this.rocketView.draw(canvas);
         }
     }
 

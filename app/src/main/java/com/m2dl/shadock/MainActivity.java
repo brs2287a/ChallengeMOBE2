@@ -40,10 +40,10 @@ public class MainActivity extends Activity implements View.OnTouchListener, Sens
     private int background_color = Color.WHITE;
     private int ball_color = Color.BLACK;
 
-    private String guid = Accueil.sharedPreferences.getString("GUID", Accueil.guidNotRetrieve());
+    private final String guid = Accueil.sharedPreferences.getString("GUID", Accueil.guidNotRetrieve());
 
     // Access a Cloud Firestore instance from your Activity
-    private FirebaseFirestore db = FirebaseFirestore.getInstance();
+    private final FirebaseFirestore db = FirebaseFirestore.getInstance();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -68,8 +68,6 @@ public class MainActivity extends Activity implements View.OnTouchListener, Sens
         gameView = findViewById(R.id.surfaceView);
         gameView.setActivity(this);
         gameView.setOnTouchListener(this);
-
-        myRocketView = findViewById(R.id.myRocketView);
     }
 
     @Override
@@ -81,16 +79,16 @@ public class MainActivity extends Activity implements View.OnTouchListener, Sens
                 gameView.setActualSpeed(gameView.getActualSpeed()+1);
                 switch (gameView.getDirection()) {
                     case HAUT:
-                        gameView.setDirection(gameView.randomDirection(gameView.getDirection()));
+                        gameView.setDirection(GameView.randomDirection(gameView.getDirection()));
                         break;
                     case BAS:
-                        gameView.setDirection(gameView.randomDirection(gameView.getDirection()));
+                        gameView.setDirection(GameView.randomDirection(gameView.getDirection()));
                         break;
                     case DROITE:
-                        gameView.setDirection(gameView.randomDirection(gameView.getDirection()));
+                        gameView.setDirection(GameView.randomDirection(gameView.getDirection()));
                         break;
                     case GAUCHE:
-                        gameView.setDirection(gameView.randomDirection(gameView.getDirection()));
+                        gameView.setDirection(GameView.randomDirection(gameView.getDirection()));
 
                         break;
                 }
