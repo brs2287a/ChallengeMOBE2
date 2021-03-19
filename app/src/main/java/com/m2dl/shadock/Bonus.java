@@ -5,7 +5,7 @@ import java.util.Random;
 public class Bonus extends GameElements {
     public Bonus(int x,int y){
         Random r = new Random();
-        setX(r.nextInt(x));
+        setX(r.nextInt(x - 50) + 50);
         setY(y);
     }
 }

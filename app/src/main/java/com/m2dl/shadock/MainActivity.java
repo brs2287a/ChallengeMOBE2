@@ -30,6 +30,7 @@ import static android.view.View.VISIBLE;
 
 public class MainActivity extends Activity implements View.OnTouchListener, SensorEventListener {
 
+    public static int SPEED_ENNEMIES = 2;
     private GameView gameView;
     private TextView tv;
     private TextView tvScore;
@@ -66,7 +67,7 @@ public class MainActivity extends Activity implements View.OnTouchListener, Sens
                 mHandler.postDelayed(this, 400);
             } else {
                 if (!touched) {
-                    gameView.setActualSpeed(gameView.getActualSpeed() + 1);
+                    gameView.augmentSpeed();
                 }
                 mHandler.postDelayed(this, duration);
             }
@@ -152,7 +153,7 @@ public class MainActivity extends Activity implements View.OnTouchListener, Sens
         switch (action) {
             case (MotionEvent.ACTION_DOWN):
                 if (!waintingInput) {
-                    gameView.setActualSpeed(gameView.getActualSpeed() + 1);
+                    gameView.augmentSpeed();
                 } else {
                     touched = true;
                 }

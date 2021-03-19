@@ -26,7 +26,7 @@ public abstract class GameElements {
         if(getY()>height+50){
             isHigher = true;
         }
-        y = y +1;
+        y = y + 2;
         return isHigher;
     }
 }
