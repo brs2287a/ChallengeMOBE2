@@ -171,6 +171,7 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Sen
         shadokPumpOne = ResourcesCompat.getDrawable(getResources(), R.drawable.pump_way_one, null);
         shadokPumpTwo = ResourcesCompat.getDrawable(getResources(), R.drawable.pump_way_two, null);
         shadokTired = ResourcesCompat.getDrawable(getResources(), R.drawable.tiringpump, null);
+        rythm = false;
 
     }
 
@@ -301,6 +302,10 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Sen
         }
 
         return fin;
+    }
+
+    public void updateRythm() {
+        rythm = !rythm;
     }
 
     @Override

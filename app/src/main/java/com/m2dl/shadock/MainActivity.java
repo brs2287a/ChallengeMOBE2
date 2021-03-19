@@ -44,7 +44,7 @@ public class MainActivity extends Activity implements View.OnTouchListener, Sens
     private Sensor light;
 
     private int background_color = Color.WHITE;
-    private int ball_color = Color.BLACK;
+    private final int ball_color = Color.BLACK;
 
     private final String guid = Accueil.sharedPreferences.getString("GUID", Accueil.guidNotRetrieve());
 
@@ -61,6 +61,7 @@ public class MainActivity extends Activity implements View.OnTouchListener, Sens
     private final Runnable mUpdateTimeTask = new Runnable() {
         public void run() {
             waintingInput = !waintingInput;
+            gameView.updateRythm();
             if (waintingInput) {
                 initAnim(Color.RED, 400);
                 touched = false;
