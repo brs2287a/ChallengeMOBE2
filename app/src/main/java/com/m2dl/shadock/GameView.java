@@ -275,6 +275,7 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Sen
             if ((bonuses.get(i).getX() - 100 <= x && x <= bonuses.get(i).getX() + 100) && (bonuses.get(i).getY() - 100 <= y && y <= bonuses.get(i).getY() + 100)) {
                 System.out.println(score);
                 score = score + 100;
+                GameView.SPEED = 300;
                 System.out.println(score);
                 bonuses.remove(bonuses.get(i));
                 spawBonuses();
