@@ -274,10 +274,6 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Sen
         super.draw(canvas);
         if (canvas != null) {
             canvas.drawColor(Color.WHITE);
-            Paint paint = new Paint();
-            paint.setColor(Color.RED);
-            canvas.drawCircle(x, y, rayon, paint);
-            paint.setColor(this.ball_color);
             mCustomImage.setBounds(new Rect(x - 50, y - 75, x + 50, y + 75));
             mCustomImage.draw(canvas);
 

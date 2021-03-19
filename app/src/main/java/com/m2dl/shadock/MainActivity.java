@@ -49,7 +49,6 @@ public class MainActivity extends Activity implements View.OnTouchListener, Sens
 
     // Access a Cloud Firestore instance from your Activity
     private final FirebaseFirestore db = FirebaseFirestore.getInstance();
-    private final FirebaseFirestore db = FirebaseFirestore.getInstance();
     private ObjectAnimator animHaut;
     private ObjectAnimator animBas;
     private ObjectAnimator animDroite;
