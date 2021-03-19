@@ -1,33 +1,33 @@
 {
   "project_info": {
-    "project_number": "843706113310",
-    "project_id": "ballgamem2",
-    "storage_bucket": "ballgamem2.appspot.com"
+    "project_number": "1020025601615",
+    "project_id": "challengemobe-ccb43",
+    "storage_bucket": "challengemobe-ccb43.appspot.com"
   },
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:843706113310:android:3e5f13edda81d527197d0f",
+        "mobilesdk_app_id": "1:1020025601615:android:4c55fca5c64114418b343a",
         "android_client_info": {
-          "package_name": "com.m2dl.ballgame"
+          "package_name": "com.m2dl.shadock"
         }
       },
       "oauth_client": [
         {
-          "client_id": "843706113310-gmv9m272a84rtd9u3v7hbqub8lscnqeo.apps.googleusercontent.com",
+          "client_id": "1020025601615-i09fktcda055gtc97f6bvmtgakkfrh4f.apps.googleusercontent.com",
           "client_type": 3
         }
       ],
       "api_key": [
         {
-          "current_key": "AIzaSyCsDWYhXVgnCf2C5su3CIrGw3yRyaLaThs"
+          "current_key": "AIzaSyCVG0D3W5eFAhHt63njSY0tT1K7j1bKRtw"
         }
       ],
       "services": {
         "appinvite_service": {
           "other_platform_oauth_client": [
             {
-              "client_id": "843706113310-gmv9m272a84rtd9u3v7hbqub8lscnqeo.apps.googleusercontent.com",
+              "client_id": "1020025601615-i09fktcda055gtc97f6bvmtgakkfrh4f.apps.googleusercontent.com",
               "client_type": 3
             }
           ]

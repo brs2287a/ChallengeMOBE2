@@ -1,4 +1,4 @@
-package com.m2dl.ballgame;
+package com.m2dl.shadock;
 
 import android.graphics.Canvas;
 import android.view.SurfaceHolder;

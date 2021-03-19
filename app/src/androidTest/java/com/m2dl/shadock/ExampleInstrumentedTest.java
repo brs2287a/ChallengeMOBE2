@@ -1,4 +1,4 @@
-package com.m2dl.ballgame;
+package com.m2dl.shadock;
 
 import android.content.Context;
 
@@ -21,6 +21,6 @@ public class ExampleInstrumentedTest {
     public void useAppContext() {
         // Context of the app under test.
         Context appContext = InstrumentationRegistry.getInstrumentation().getTargetContext();
-        assertEquals("com.m2dl.ballgame", appContext.getPackageName());
+        assertEquals("com.m2dl.shadock", appContext.getPackageName());
     }
 }

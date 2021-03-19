@@ -1,4 +1,4 @@
-package com.m2dl.ballgame;
+package com.m2dl.shadock;
 
 import android.content.Intent;
 import android.os.Bundle;
