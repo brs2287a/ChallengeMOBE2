@@ -35,29 +35,29 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Sen
     private final int width;
     private final int height;
     private final long debut;
-    private GameThread thread;
+    private final GameThread thread;
     private int x;
-    private int y;
+    private final int y;
     private Direction direction;
-    private SensorManager sensorManager;
+    private final SensorManager sensorManager;
     private int actualSpeed = 1;
     private double acceleration = 0;
-    private int rayon = 50;
+    private final int rayon = 50;
     private int score;
     private boolean dejaFini = false;
-    private Handler mHandler;
+    private final Handler mHandler;
 
-    private int background_color;
-    private int ball_color;
+    private final int background_color;
+    private final int ball_color;
 
     // Access a Cloud Firestore instance from your Activity
-    private FirebaseFirestore db = FirebaseFirestore.getInstance();
+    private final FirebaseFirestore db = FirebaseFirestore.getInstance();
 
-    private String pseudo = Accueil.sharedPreferences.getString("PlayerName", "Player 1");
-    private String guid = Accueil.sharedPreferences.getString("GUID", Accueil.guidNotRetrieve());
+    private final String pseudo = Accueil.sharedPreferences.getString("PlayerName", "Player 1");
+    private final String guid = Accueil.sharedPreferences.getString("GUID", Accueil.guidNotRetrieve());
     private MainActivity activity;
     // un Runnable qui sera appelé par le timer
-    private Runnable mUpdateTimeTask = new Runnable() {
+    private final Runnable mUpdateTimeTask = new Runnable() {
         public void run() {
             score = (int) (System.currentTimeMillis() / 100 - debut);
             activity.setTextTv("" + score);
@@ -81,7 +81,7 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Sen
         width = this.getResources().getDisplayMetrics().widthPixels;
         height = this.getResources().getDisplayMetrics().heightPixels;
         x = width / 2;
-        y = height / 2;
+        y = height - (height / 15);
         debut = System.currentTimeMillis() / 100;
         mHandler = new Handler();
         mHandler.postDelayed(mUpdateTimeTask, 100);
@@ -113,24 +113,8 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Sen
     }
 
     public void update() {
-        background_color = Accueil.sharedPreferences.getInt("BackgroundColor", Color.BLACK);
-        ball_color = Accueil.sharedPreferences.getInt("BallColor", Color.WHITE);
-
         if (!isFinDujeu()) {
-            switch (direction) {
-                case HAUT:
-                    y = (int) Math.round(y + actualSpeed * acceleration);
-                    break;
-                case BAS:
-                    y = (int) Math.round(y - actualSpeed * acceleration);
-                    break;
-                case DROITE:
-                    x = (int) Math.round(x + actualSpeed * acceleration);
-                    break;
-                case GAUCHE:
-                    x = (int) Math.round(x - actualSpeed * acceleration);
-                    break;
-            }
+            x = (int) Math.round(x + actualSpeed * acceleration);
         }
 
     }
@@ -152,10 +136,10 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Sen
     public void draw(Canvas canvas) {
         super.draw(canvas);
         if (canvas != null) {
-            canvas.drawColor(this.background_color);
+            canvas.drawColor(Color.WHITE);
             Paint paint = new Paint();
-            paint.setColor(this.ball_color);
-            canvas.drawCircle(x, y, rayon,  paint);
+            paint.setColor(Color.RED);
+            canvas.drawCircle(x, y, rayon, paint);
         }
     }
 
@@ -188,76 +172,24 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Sen
     @Override
     public void onSensorChanged(SensorEvent event) {
         float axisX = event.values[0];
-        float axisY = event.values[1];
-        switch (direction) {
-            case HAUT:
-                if (axisY > 7) {
-                    acceleration = 4;
-                } else if (axisY > 5) {
-                    acceleration = 2;
-                } else if (axisY > 3) {
-                    acceleration = 1.5;
-                } else if (axisY < -7) {
-                    acceleration = 0.7;
-                } else if (axisY < -5) {
-                    acceleration = 0.9;
-                } else if (axisY < -3) {
-                    acceleration = 0.95;
-                } else {
-                    acceleration = 1;
-                }
-                break;
-            case BAS:
-                if (axisY > 7) {
-                    acceleration = 0.7;
-                } else if (axisY > 5) {
-                    acceleration = 0.9;
-                } else if (axisY > 3) {
-                    acceleration = 0.95;
-                } else if (axisY < -7) {
-                    acceleration = 4;
-                } else if (axisY < -5) {
-                    acceleration = 2;
-                } else if (axisY < -3) {
-                    acceleration = 1.5;
-                } else {
-                    acceleration = 1;
-                }
-                break;
-            case GAUCHE:
-                if (axisX > 7) {
-                    acceleration = 4;
-                } else if (axisX > 5) {
-                    acceleration = 2;
-                } else if (axisX > 3) {
-                    acceleration = 1.5;
-                } else if (axisX < -7) {
-                    acceleration = 0.7;
-                } else if (axisX < -5) {
-                    acceleration = 0.9;
-                } else if (axisX < -3) {
-                    acceleration = 0.95;
-                } else {
-                    acceleration = 1;
-                }
-                break;
-            case DROITE:
-                if (axisX > 7) {
-                    acceleration = 0.7;
-                } else if (axisX > 5) {
-                    acceleration = 0.9;
-                } else if (axisX > 3) {
-                    acceleration = 0.95;
-                } else if (axisX < -7) {
-                    acceleration = 4;
-                } else if (axisX < -5) {
-                    acceleration = 2;
-                } else if (axisX < -3) {
-                    acceleration = 1.5;
-                } else {
-                    acceleration = 1;
-                }
-                break;
+        if (axisX > 7) {
+            acceleration = -6;
+        } else if (axisX > 5) {
+            acceleration = -4;
+        } else if (axisX > 3) {
+            acceleration = -2;
+        } else if (axisX > 1) {
+            acceleration = -1;
+        } else if (axisX < -7) {
+            acceleration = 6;
+        } else if (axisX < -5) {
+            acceleration = 4;
+        } else if (axisX < -3) {
+            acceleration = 2;
+        } else if (axisX < -1) {
+            acceleration = 1;
+        } else {
+            acceleration = 0;
         }
     }
 
