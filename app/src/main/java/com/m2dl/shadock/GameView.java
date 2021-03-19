@@ -4,6 +4,8 @@ import android.content.Context;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
+import android.graphics.Rect;
+import android.graphics.drawable.Drawable;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
@@ -15,6 +17,7 @@ import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 
 import androidx.annotation.NonNull;
+import androidx.core.content.res.ResourcesCompat;
 
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
@@ -66,12 +69,22 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Sen
     private final ArrayList<Ennemy> ennemies;
     private final ArrayList<Bonus> bonuses;
 
+    private final Drawable mCustomImage;
+    private final Drawable shadokPumpOne;
+    private final Drawable shadokPumpTwo;
+    private final Drawable shadokTired;
+
+    private boolean pump = true;
+    private boolean rythm = true;
+    private boolean tired = false;
+
     // Access a Cloud Firestore instance from your Activity
     private final FirebaseFirestore db = FirebaseFirestore.getInstance();
 
     private final String pseudo = Accueil.sharedPreferences.getString("PlayerName", "Player 1");
     private final String guid = Accueil.sharedPreferences.getString("GUID", Accueil.guidNotRetrieve());
     private MainActivity activity;
+
     // un Runnable qui sera appelé par le timer
     private final Runnable mUpdateTimeTask = new Runnable() {
         public void run() {
@@ -182,6 +195,10 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Sen
         debut = System.currentTimeMillis() / 100;
         mHandler = new Handler();
         mHandler.postDelayed(mUpdateTimeTask, 100);
+        mCustomImage = ResourcesCompat.getDrawable(getResources(), R.drawable.fusee_shadocks_resized, null);
+        shadokPumpOne = ResourcesCompat.getDrawable(getResources(), R.drawable.pump_way_one, null);
+        shadokPumpTwo = ResourcesCompat.getDrawable(getResources(), R.drawable.pump_way_two, null);
+        shadokTired = ResourcesCompat.getDrawable(getResources(), R.drawable.tiringpump, null);
         spawEnemies();
         spawBonuses();
         mHandlerUpdateEnnemy = new Handler();
@@ -237,6 +254,9 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Sen
 
     private boolean isFinDujeu() {
         if (!dejaFini && fin) {
+            pump = false;
+            rythm = false;
+            tired = true;
             dejaFini = true;
             mHandler.removeCallbacks(mUpdateTimeTask);
             mHandlerUpdateEnnemy.removeCallbacks(mUpdateTimeEnemy);
@@ -249,7 +269,6 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Sen
         return fin;
     }
 
-
     @Override
     public void draw(Canvas canvas) {
         super.draw(canvas);
@@ -258,6 +277,26 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Sen
             Paint paint = new Paint();
             paint.setColor(Color.RED);
             canvas.drawCircle(x, y, rayon, paint);
+            paint.setColor(this.ball_color);
+            mCustomImage.setBounds(new Rect(x - 50, y - 75, x + 50, y + 75));
+            mCustomImage.draw(canvas);
+
+            if (rythm) {
+                if (pump) {
+                    shadokPumpOne.setBounds(new Rect(100, 100, 200, 200));
+                    shadokPumpOne.draw(canvas);
+                    pump = false;
+                } else {
+                    shadokPumpTwo.setBounds(new Rect(100, 100, 200, 200));
+                    shadokPumpTwo.draw(canvas);
+                    pump = true;
+                }
+            }
+
+            if (tired) {
+                shadokTired.setBounds(new Rect(150, 500, 650, 900));
+                shadokTired.draw(canvas);
+            }
         }
         drawEnnemy(canvas);
         drawBonus(canvas);
