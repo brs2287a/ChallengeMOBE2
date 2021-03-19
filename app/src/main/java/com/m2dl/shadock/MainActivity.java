@@ -12,6 +12,7 @@ import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
 import android.os.Bundle;
+import android.os.Handler;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.Window;
@@ -19,6 +20,7 @@ import android.view.WindowManager;
 import android.view.animation.Animation;
 import android.widget.Button;
 import android.widget.LinearLayout;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.google.firebase.firestore.FirebaseFirestore;
@@ -51,6 +53,26 @@ public class MainActivity extends Activity implements View.OnTouchListener, Sens
     private ObjectAnimator animBas;
     private ObjectAnimator animDroite;
     private ObjectAnimator animGauche;
+    private boolean waintingInput = false;
+    private boolean touched = false;
+    private Handler mHandler;
+
+    private final Runnable mUpdateTimeTask = new Runnable() {
+        public void run() {
+            waintingInput = !waintingInput;
+            if (waintingInput) {
+                initAnim(Color.RED, 400);
+                touched = false;
+                mHandler.postDelayed(this, 400);
+            } else {
+                if (!touched) {
+                    gameView.setActualSpeed(gameView.getActualSpeed() + 1);
+                }
+                mHandler.postDelayed(this, duration);
+            }
+        }
+    };
+    private int duration;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -75,14 +97,18 @@ public class MainActivity extends Activity implements View.OnTouchListener, Sens
         gameView = findViewById(R.id.surfaceView);
         gameView.setActivity(this);
         gameView.setOnTouchListener(this);
-        initAnim(Color.RED, 1000);
+        duration = 800;
+        mHandler = new Handler();
+        mHandler.postDelayed(mUpdateTimeTask, duration);
     }
 
     public void initAnim(int color, int duration) {
+        RelativeLayout bordure = findViewById(R.id.bordure);
         LinearLayout bordureHaut = findViewById(R.id.bordureHaut);
         LinearLayout bordureBas = findViewById(R.id.bordureBas);
         LinearLayout bordureDroite = findViewById(R.id.bordureDroite);
         LinearLayout bordureGauche = findViewById(R.id.bordureGauche);
+        bordure.setVisibility(VISIBLE);
         if (animBas != null) {
             animBas.cancel();
             animHaut.cancel();
@@ -94,28 +120,28 @@ public class MainActivity extends Activity implements View.OnTouchListener, Sens
         animHaut.setDuration(duration);
         animHaut.setEvaluator(new ArgbEvaluator());
         animHaut.setRepeatMode(ValueAnimator.REVERSE);
-        animHaut.setRepeatCount(Animation.INFINITE);
-        animHaut.start();
+        animHaut.setRepeatCount(Animation.ABSOLUTE);
         animBas = ObjectAnimator.ofInt(bordureBas, "backgroundColor", Color.WHITE, color,
                 Color.WHITE);
         animBas.setDuration(duration);
         animBas.setEvaluator(new ArgbEvaluator());
         animBas.setRepeatMode(ValueAnimator.REVERSE);
-        animBas.setRepeatCount(Animation.INFINITE);
-        animBas.start();
+        animBas.setRepeatCount(Animation.ABSOLUTE);
         animDroite = ObjectAnimator.ofInt(bordureDroite, "backgroundColor", Color.WHITE, color,
                 Color.WHITE);
         animDroite.setDuration(duration);
         animDroite.setEvaluator(new ArgbEvaluator());
         animDroite.setRepeatMode(ValueAnimator.REVERSE);
-        animDroite.setRepeatCount(Animation.INFINITE);
-        animDroite.start();
+        animDroite.setRepeatCount(Animation.ABSOLUTE);
         animGauche = ObjectAnimator.ofInt(bordureGauche, "backgroundColor", Color.WHITE, color,
                 Color.WHITE);
         animGauche.setDuration(duration);
         animGauche.setEvaluator(new ArgbEvaluator());
         animGauche.setRepeatMode(ValueAnimator.REVERSE);
-        animGauche.setRepeatCount(Animation.INFINITE);
+        animGauche.setRepeatCount(Animation.ABSOLUTE);
+        animHaut.start();
+        animBas.start();
+        animDroite.start();
         animGauche.start();
     }
 
@@ -125,21 +151,10 @@ public class MainActivity extends Activity implements View.OnTouchListener, Sens
         int action = event.getActionMasked();
         switch (action) {
             case (MotionEvent.ACTION_DOWN):
-                gameView.setActualSpeed(gameView.getActualSpeed() + 1);
-                switch (gameView.getDirection()) {
-                    case HAUT:
-                        gameView.setDirection(GameView.randomDirection(gameView.getDirection()));
-                        break;
-                    case BAS:
-                        gameView.setDirection(GameView.randomDirection(gameView.getDirection()));
-                        break;
-                    case DROITE:
-                        gameView.setDirection(GameView.randomDirection(gameView.getDirection()));
-                        break;
-                    case GAUCHE:
-                        gameView.setDirection(GameView.randomDirection(gameView.getDirection()));
-
-                        break;
+                if (!waintingInput) {
+                    gameView.setActualSpeed(gameView.getActualSpeed() + 1);
+                } else {
+                    touched = true;
                 }
                 break;
         }

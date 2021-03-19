@@ -21,37 +21,33 @@
             android:id="@+id/bordureHaut"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:layout_alignParentTop="true"
             android:orientation="horizontal"
-            android:padding="5dp"
-            android:background="@color/black"
-            android:layout_alignParentTop="true" />
+            android:padding="5dp" />
 
         <LinearLayout
             android:id="@+id/bordureBas"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:layout_alignParentBottom="true"
             android:orientation="horizontal"
-            android:padding="5dp"
-            android:background="@color/black"
-            android:layout_alignParentBottom="true" />
+            android:padding="5dp" />
 
         <LinearLayout
             android:id="@+id/bordureGauche"
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
+            android:layout_alignParentStart="true"
             android:orientation="horizontal"
-            android:padding="5dp"
-            android:background="@color/black"
-            android:layout_alignParentStart="true" />
+            android:padding="5dp" />
 
         <LinearLayout
             android:id="@+id/bordureDroite"
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
+            android:layout_alignParentEnd="true"
             android:orientation="horizontal"
-            android:padding="5dp"
-            android:background="@color/black"
-            android:layout_alignParentEnd="true" />
+            android:padding="5dp" />
     </RelativeLayout>
 
 
