@@ -190,7 +190,7 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Sen
             }
 
             if (tired) {
-                shadokTired.setBounds(new Rect(100, 100, 500, 500));
+                shadokTired.setBounds(new Rect(150, 500, 650, 900));
                 shadokTired.draw(canvas);
             }
         }

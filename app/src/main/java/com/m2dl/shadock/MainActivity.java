@@ -114,21 +114,12 @@ public class MainActivity extends Activity implements View.OnTouchListener, Sens
         if (event.sensor.getType() == Sensor.TYPE_LIGHT) {
             float light_value = event.values[0];
             System.out.println(light_value);
-            if ( 0 <= light_value && light_value < 5) {
-                background_color = Color.YELLOW;
-                ball_color = Color.MAGENTA;
-            } else if (5 <= light_value && light_value < 7) {
-                background_color = Color.MAGENTA;
-                ball_color = Color.GREEN;
-            } else if (7 <= light_value && light_value < 10) {
-                background_color = Color.GREEN;
-                ball_color = Color.BLUE;
+            if (0 <= light_value && light_value < 500) {
+                background_color = Color.WHITE;
             } else {
-                background_color = Color.BLUE;
-                ball_color = Color.RED;
+                background_color = Color.GREEN;
             }
             editor.putInt("BackgroundColor", background_color);
-            editor.putInt("BallColor", ball_color);
             editor.apply();
         }
     }
