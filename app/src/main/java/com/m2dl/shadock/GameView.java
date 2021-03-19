@@ -58,16 +58,17 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Sen
 
     private int indexOne = 0;
     private int indexTwo = 1;
+    private int indexThree = 4;
+    private int indexFour = 5;
 
     private boolean fin = false;
 
-    private final int background_color;
+    private int background_color;
     private final int ball_color;
 
     private boolean endList = false;
     private int nbMax;
     private int cpt = 3;
-
 
     private final ArrayList<Ennemy> ennemies;
     private final ArrayList<Bonus> bonuses;
@@ -151,7 +152,7 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Sen
         getHolder().addCallback(this);
         setFocusable(true);
 
-        background_color = Accueil.sharedPreferences.getInt("BackgroundColor", Color.BLACK);
+        background_color = Accueil.sharedPreferences.getInt("BackgroundColor", Color.WHITE);
         ball_color = Accueil.sharedPreferences.getInt("BallColor", Color.WHITE);
 
 
@@ -201,46 +202,43 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Sen
 
     }
 
-
     private void spawEnemies() {
 
         nbMax = (width / (rayon * 2));
         System.out.println(nbMax);
         xEnnemy = 0;
-        if(indexOne==nbMax-4){
-            endList = true;
-        }else if(indexOne == 0){
-            endList=false;
+        if(indexOne==0){
+            endList = false;
+        }else if(indexOne != 0){
+            endList=true;
         }
         for (int i = 0; i < nbMax-1; ++i) {
             Ennemy ennemy = new Ennemy(xEnnemy);
             xEnnemy = xEnnemy + 120;
-            if (indexOne != i && indexTwo!=i)
+            if (indexOne != i && indexTwo!=i && indexThree!=i && indexFour!=i)
                 ennemies.add(ennemy);
         }
         Ennemy ennemy = new Ennemy(xEnnemy);
         xEnnemy = xEnnemy + 120;
         ennemies.add(ennemy);
         highestEnnemy = ennemy;
-        if(!endList){
-            indexOne = indexOne+2;
-            indexTwo= indexTwo+2;
-        }else if(endList){
-            indexOne = indexOne-2;
-            indexTwo= indexTwo-2;
+        if(endList){
+            indexOne = 0;
+            indexTwo= 1;
+            indexThree=4;
+            indexFour=5;
+        }else if(!endList){
+            indexOne = 2;
+            indexTwo= 3;
+            indexThree=6;
+            indexFour=7;
         }
-
-
-
-
     }
+
     private void spawBonuses() {
         Bonus bonus = new Bonus(width, 200);
         bonuses.add(bonus);
     }
-
-
-
 
     @Override
     public void surfaceCreated(@NonNull SurfaceHolder holder) {
@@ -268,6 +266,7 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Sen
     }
 
     public void update() {
+        background_color = Accueil.sharedPreferences.getInt("BackgroundColor", Color.WHITE);
         for (Ennemy e: ennemies) {
             if ((e.getX() - 100 <= x && x <= e.getX() + 100) && (e.getY() - 100 <= y && y <= e.getY() + 100))
                 fin = true;
@@ -309,7 +308,7 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Sen
     public void draw(Canvas canvas) {
         super.draw(canvas);
         if (canvas != null) {
-            canvas.drawColor(Color.WHITE);
+            canvas.drawColor(this.background_color);
             mCustomImage.setBounds(new Rect(x - 50, y - 75, x + 50, y + 75));
             mCustomImage.draw(canvas);
 
