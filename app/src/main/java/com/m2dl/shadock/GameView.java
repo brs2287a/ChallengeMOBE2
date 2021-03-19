@@ -15,6 +15,7 @@ import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 
 import androidx.annotation.NonNull;
+import androidx.constraintlayout.solver.widgets.Rectangle;
 
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
@@ -49,6 +50,8 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Sen
 
     private int background_color;
     private int ball_color;
+
+    private MyRocketView rocketView;
 
     // Access a Cloud Firestore instance from your Activity
     private FirebaseFirestore db = FirebaseFirestore.getInstance();
@@ -147,7 +150,6 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Sen
         return fin;
     }
 
-
     @Override
     public void draw(Canvas canvas) {
         super.draw(canvas);
@@ -156,6 +158,8 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Sen
             Paint paint = new Paint();
             paint.setColor(this.ball_color);
             canvas.drawCircle(x, y, rayon,  paint);
+
+            this.rocketView.draw(canvas);
         }
     }
 

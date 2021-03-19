@@ -30,6 +30,8 @@ public class MainActivity extends Activity implements View.OnTouchListener, Sens
     private Button scoreButton;
     private Button homeButton;
 
+    private MyRocketView myRocketView;
+
     public SharedPreferences.Editor editor;
 
     private SensorManager sensorManager = null;
@@ -66,6 +68,8 @@ public class MainActivity extends Activity implements View.OnTouchListener, Sens
         gameView = findViewById(R.id.surfaceView);
         gameView.setActivity(this);
         gameView.setOnTouchListener(this);
+
+        myRocketView = findViewById(R.id.myRocketView);
     }
 
     @Override
