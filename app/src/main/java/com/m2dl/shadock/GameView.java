@@ -176,6 +176,7 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Sen
         shadokTired = ResourcesCompat.getDrawable(getResources(), R.drawable.tiringpump, null);
         fuseeGibi = ResourcesCompat.getDrawable(getResources(), R.drawable.fusee_gibi, null);
         passoire = ResourcesCompat.getDrawable(getResources(), R.drawable.passoire_alpha, null);
+        rythm = false;
 
     }
 
@@ -305,6 +306,10 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Sen
         }
 
         return fin;
+    }
+
+    public void updateRythm() {
+        rythm = !rythm;
     }
 
     @Override
