@@ -36,8 +36,8 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Sen
     private final Sensor sensor;
     private final int width;
     private final int height;
-    private final long debut;
-    private final GameThread thread;
+    private long debut;
+    private GameThread thread;
     private int x;
     private final int y;
     private int xEnnemy = 0;
@@ -48,12 +48,13 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Sen
     private final int rayon = 50;
     private int score;
     private boolean dejaFini = false;
-    private final Handler mHandler;
-    private final Handler mHandlerUpdateEnnemy;
+    private Handler mHandler;
+    private Handler mHandlerUpdateEnnemy;
+    private final Handler mHandlerInit;
     private Ennemy highestEnnemy;
 
-    private int indexOne=0;
-    private int indexTwo=1;
+    private int indexOne = 0;
+    private int indexTwo = 1;
 
     private boolean fin = false;
 
@@ -62,6 +63,7 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Sen
 
     private boolean endList = false;
     private int nbMax;
+    private int cpt = 3;
 
 
     private final ArrayList<Ennemy> ennemies;
@@ -90,9 +92,25 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Sen
         }
     };
 
+    private final Runnable mInitTask = new Runnable() {
+        public void run() {
+            if (cpt > 0) {
+                activity.setTextTv("" + cpt);
+                --cpt;
+                mHandlerInit.postDelayed(this, 1000);
+            } else if (cpt == 0) {
+                activity.setTextTv("GO");
+                --cpt;
+                mHandlerInit.postDelayed(this, 1000);
+            } else {
+                launchGame();
+            }
+        }
+    };
+
     private void updateEnnemies() {
-        int i=0;
-        while (i<ennemies.size()) {
+        int i = 0;
+        while (i < ennemies.size()) {
             ennemies.get(i).updatePosition(height);
             if (ennemies.get(i) == highestEnnemy) {
                 if (ennemies.get(i).getY() > HAUTEUR_LIGNE_VIDE) {
@@ -118,7 +136,6 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Sen
         super(context, attrs);
         getHolder().addCallback(this);
         setFocusable(true);
-        direction = randomDirection();
 
         background_color = Accueil.sharedPreferences.getInt("BackgroundColor", Color.BLACK);
         ball_color = Accueil.sharedPreferences.getInt("BallColor", Color.WHITE);
@@ -135,6 +152,13 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Sen
         height = this.getResources().getDisplayMetrics().heightPixels;
         x = width / 2;
         y = height - (height / 15);
+        mHandlerInit = new Handler();
+        mHandlerInit.postDelayed(mInitTask, 0);
+
+    }
+
+    private void launchGame() {
+        thread = new GameThread(getHolder(), this);
         debut = System.currentTimeMillis() / 100;
         mHandler = new Handler();
         mHandler.postDelayed(mUpdateTimeTask, 100);
