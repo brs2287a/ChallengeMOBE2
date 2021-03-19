@@ -1,5 +1,8 @@
 package com.m2dl.shadock;
 
+import android.animation.ArgbEvaluator;
+import android.animation.ObjectAnimator;
+import android.animation.ValueAnimator;
 import android.app.Activity;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -13,7 +16,9 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
+import android.view.animation.Animation;
 import android.widget.Button;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.google.firebase.firestore.FirebaseFirestore;
@@ -38,10 +43,14 @@ public class MainActivity extends Activity implements View.OnTouchListener, Sens
     private int background_color = Color.WHITE;
     private int ball_color = Color.BLACK;
 
-    private String guid = Accueil.sharedPreferences.getString("GUID", Accueil.guidNotRetrieve());
+    private final String guid = Accueil.sharedPreferences.getString("GUID", Accueil.guidNotRetrieve());
 
     // Access a Cloud Firestore instance from your Activity
-    private FirebaseFirestore db = FirebaseFirestore.getInstance();
+    private final FirebaseFirestore db = FirebaseFirestore.getInstance();
+    private ObjectAnimator animHaut;
+    private ObjectAnimator animBas;
+    private ObjectAnimator animDroite;
+    private ObjectAnimator animGauche;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -66,6 +75,48 @@ public class MainActivity extends Activity implements View.OnTouchListener, Sens
         gameView = findViewById(R.id.surfaceView);
         gameView.setActivity(this);
         gameView.setOnTouchListener(this);
+        initAnim(Color.RED, 1000);
+    }
+
+    public void initAnim(int color, int duration) {
+        LinearLayout bordureHaut = findViewById(R.id.bordureHaut);
+        LinearLayout bordureBas = findViewById(R.id.bordureBas);
+        LinearLayout bordureDroite = findViewById(R.id.bordureDroite);
+        LinearLayout bordureGauche = findViewById(R.id.bordureGauche);
+        if (animBas != null) {
+            animBas.cancel();
+            animHaut.cancel();
+            animDroite.cancel();
+            animGauche.cancel();
+        }
+        animHaut = ObjectAnimator.ofInt(bordureHaut, "backgroundColor", Color.WHITE, color,
+                Color.WHITE);
+        animHaut.setDuration(duration);
+        animHaut.setEvaluator(new ArgbEvaluator());
+        animHaut.setRepeatMode(ValueAnimator.REVERSE);
+        animHaut.setRepeatCount(Animation.INFINITE);
+        animHaut.start();
+        animBas = ObjectAnimator.ofInt(bordureBas, "backgroundColor", Color.WHITE, color,
+                Color.WHITE);
+        animBas.setDuration(duration);
+        animBas.setEvaluator(new ArgbEvaluator());
+        animBas.setRepeatMode(ValueAnimator.REVERSE);
+        animBas.setRepeatCount(Animation.INFINITE);
+        animBas.start();
+        animDroite = ObjectAnimator.ofInt(bordureDroite, "backgroundColor", Color.WHITE, color,
+                Color.WHITE);
+        animDroite.setDuration(duration);
+        animDroite.setEvaluator(new ArgbEvaluator());
+        animDroite.setRepeatMode(ValueAnimator.REVERSE);
+        animDroite.setRepeatCount(Animation.INFINITE);
+        animDroite.start();
+        animGauche = ObjectAnimator.ofInt(bordureGauche, "backgroundColor", Color.WHITE, color,
+                Color.WHITE);
+        animGauche.setDuration(duration);
+        animGauche.setEvaluator(new ArgbEvaluator());
+        animGauche.setRepeatMode(ValueAnimator.REVERSE);
+        animGauche.setRepeatCount(Animation.INFINITE);
+        animGauche.start();
     }
 
     @Override
@@ -74,19 +125,19 @@ public class MainActivity extends Activity implements View.OnTouchListener, Sens
         int action = event.getActionMasked();
         switch (action) {
             case (MotionEvent.ACTION_DOWN):
-                gameView.setActualSpeed(gameView.getActualSpeed()+1);
+                gameView.setActualSpeed(gameView.getActualSpeed() + 1);
                 switch (gameView.getDirection()) {
                     case HAUT:
-                        gameView.setDirection(gameView.randomDirection(gameView.getDirection()));
+                        gameView.setDirection(GameView.randomDirection(gameView.getDirection()));
                         break;
                     case BAS:
-                        gameView.setDirection(gameView.randomDirection(gameView.getDirection()));
+                        gameView.setDirection(GameView.randomDirection(gameView.getDirection()));
                         break;
                     case DROITE:
-                        gameView.setDirection(gameView.randomDirection(gameView.getDirection()));
+                        gameView.setDirection(GameView.randomDirection(gameView.getDirection()));
                         break;
                     case GAUCHE:
-                        gameView.setDirection(gameView.randomDirection(gameView.getDirection()));
+                        gameView.setDirection(GameView.randomDirection(gameView.getDirection()));
 
                         break;
                 }
