@@ -309,8 +309,6 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Sen
         super.draw(canvas);
         if (canvas != null) {
             canvas.drawColor(this.background_color);
-            mCustomImage.setBounds(new Rect(x - 50, y - 75, x + 50, y + 75));
-            canvas.drawColor(Color.WHITE);
             Rect shadok = new Rect(x - 50, y - 75, x + 50, y + 75);
             mCustomImage.setBounds(shadok);
             mCustomImage.draw(canvas);
