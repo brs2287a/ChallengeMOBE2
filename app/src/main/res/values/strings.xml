@@ -1,3 +1,4 @@
 <resources>
     <string name="app_name">Shadocks</string>
+    <string name="regles">Vous devez rejoindre la terre à bord de votre vaisseau durement construit\nPour cela, evitez vos rivaux Gibi en penchant votre appareil sur la droite ou la gauche\nAttention ! Votre fusée nécessite d\'etre maintenu active en touchant l\'écran lorsque les bords rouge apparaissent</string>
 </resources>
