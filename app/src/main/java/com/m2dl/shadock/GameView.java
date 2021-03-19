@@ -31,45 +31,85 @@ import static android.content.ContentValues.TAG;
 
 public class GameView extends SurfaceView implements SurfaceHolder.Callback, SensorEventListener {
 
+    private static final int HAUTEUR_LIGNE_VIDE = 150;
     private final Sensor sensor;
     private final int width;
     private final int height;
     private final long debut;
-    private GameThread thread;
+    private final GameThread thread;
     private int x;
     private int y;
     private int xEnnemy = 0;
     private Direction direction;
-    private SensorManager sensorManager;
+    private final SensorManager sensorManager;
     private int actualSpeed = 1;
     private double acceleration = 0;
-    private int rayon = 50;
+    private final int rayon = 50;
     private int score;
     private boolean dejaFini = false;
-    private Handler mHandler;
-    private boolean timeToSpawn = false;
+    private final Handler mHandler;
+    private final Handler mHandlerUpdateEnnemy;
+    private final Handler mHandlerSpawnEnnemy;
+    private Ennemy highestEnnemy;
+    private final boolean timeToSpawn = false;
 
     private int background_color;
     private int ball_color;
 
 
-
-    private ArrayList<Ennemy> ennemies;
+    private final ArrayList<Ennemy> ennemies;
 
     // Access a Cloud Firestore instance from your Activity
-    private FirebaseFirestore db = FirebaseFirestore.getInstance();
+    private final FirebaseFirestore db = FirebaseFirestore.getInstance();
 
-    private String pseudo = Accueil.sharedPreferences.getString("PlayerName", "Player 1");
-    private String guid = Accueil.sharedPreferences.getString("GUID", Accueil.guidNotRetrieve());
+    private final String pseudo = Accueil.sharedPreferences.getString("PlayerName", "Player 1");
+    private final String guid = Accueil.sharedPreferences.getString("GUID", Accueil.guidNotRetrieve());
     private MainActivity activity;
     // un Runnable qui sera appelé par le timer
-    private Runnable mUpdateTimeTask = new Runnable() {
+    private final Runnable mUpdateTimeTask = new Runnable() {
         public void run() {
             score = (int) (System.currentTimeMillis() / 100 - debut);
             activity.setTextTv("" + score);
             mHandler.postDelayed(this, 100);
         }
     };
+
+    private final Runnable mUpdateTimeEnemy = new Runnable() {
+        public void run() {
+            updateEnnemies();
+            mHandlerUpdateEnnemy.postDelayed(this, 300);
+        }
+    };
+
+    private void updateEnnemies() {
+        for (Ennemy ennemy : ennemies) {
+            ennemy.updatePosition(height);
+            if (ennemy == highestEnnemy) {
+                if (ennemy.getY() > HAUTEUR_LIGNE_VIDE) {
+                    spawEnemies();
+                }
+            }
+        }
+    }
+
+    private final Runnable mUpdateTimeEnemySpawn = new Runnable() {
+        public void run() {
+            spawEnemies();
+        }
+    };
+
+    private void spawEnemies() {
+        xEnnemy = 0;
+        for (int i = 0; i < 15; ++i) {
+            Ennemy ennemy = new Ennemy(xEnnemy);
+            xEnnemy = xEnnemy + 120;
+            ennemies.add(ennemy);
+        }
+        Ennemy ennemy = new Ennemy(xEnnemy);
+        xEnnemy = xEnnemy + 120;
+        ennemies.add(ennemy);
+        highestEnnemy = ennemy;
+    }
 
     public ArrayList<Ennemy> getEnnemies() {
         return ennemies;
@@ -98,6 +138,10 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Sen
         debut = System.currentTimeMillis() / 100;
         mHandler = new Handler();
         mHandler.postDelayed(mUpdateTimeTask, 100);
+        mHandlerSpawnEnnemy = new Handler();
+        mHandlerSpawnEnnemy.postDelayed(mUpdateTimeEnemySpawn, 100);
+        mHandlerUpdateEnnemy = new Handler();
+        mHandlerUpdateEnnemy.postDelayed(mUpdateTimeEnemy, 100);
     }
 
     @Override
@@ -165,7 +209,7 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Sen
     public void draw(Canvas canvas) {
         super.draw(canvas);
         if (canvas != null) {
-            canvas.drawColor(this.background_color);
+            canvas.drawColor(Color.WHITE);
             Paint paint = new Paint();
             paint.setColor(this.ball_color);
             canvas.drawCircle(x, y, rayon,  paint);
@@ -176,29 +220,14 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Sen
         }
     }
 
-    public void drawEnnemy(Canvas canvas){
-        int nbMax = (width/(rayon*2)) - 2;
-        if(xEnnemy>width){
-            xEnnemy = 0;
-        }
+    public void drawEnnemy(Canvas canvas) {
+        int nbMax = (width / (rayon * 2)) - 2;
 
         Paint paint = new Paint();
         paint.setColor(Color.rgb(0, 0, 255));
-        System.out.println(ennemies.size());
-        if(ennemies.size()<=16){
-            Ennemy ennemy = new Ennemy(xEnnemy);
-            xEnnemy = xEnnemy+120;
-            ennemies.add(ennemy);
-        }
 
-        if(ennemies.size()==16){
-            timeToSpawn = true;
-        }
-        if(timeToSpawn){
-            System.out.println(ennemies.size());
-            for (Ennemy e: ennemies) {
-                canvas.drawCircle(e.getX(), e.getY(), rayon,  paint);
-            }
+        for (Ennemy e : ennemies) {
+            canvas.drawCircle(e.getX(), e.getY(), rayon, paint);
         }
 
     }
