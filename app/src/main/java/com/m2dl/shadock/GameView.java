@@ -215,13 +215,15 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Sen
 
     public void update() {
         for (Ennemy e: ennemies) {
-            if((e.getX()-100<x && x<e.getX()+100) && (e.getY()-100 < y && y< e.getY()+100))
+            e.updatePosition(height);
+            if ((e.getX() - 100 <= x && x <= e.getX() + 100) && (e.getY() - 100 <= y && y <= e.getY() + 100))
                 fin = true;
         }
-        for(int i=0; i<bonuses.size();++i){
-            if((bonuses.get(i).getX()-100<x && x<bonuses.get(i).getX()+100) && (bonuses.get(i).getY()-100 < y && y< bonuses.get(i).getY()+100)){
+        for(int i=0; i<bonuses.size();++i) {
+            bonuses.get(i).updatePosition(height);
+            if ((bonuses.get(i).getX() - 100 <= x && x <= bonuses.get(i).getX() + 100) && (bonuses.get(i).getY() - 100 <= y && y <= bonuses.get(i).getY() + 100)) {
                 System.out.println(score);
-                score = score +100;
+                score = score + 100;
                 System.out.println(score);
                 bonuses.remove(bonuses.get(i));
                 spawBonuses();
@@ -258,13 +260,7 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Sen
             canvas.drawCircle(x, y, rayon, paint);
         }
         drawEnnemy(canvas);
-        for (Ennemy e: ennemies) {
-            e.updatePosition(height);
-        }
         drawBonus(canvas);
-        for (Bonus e: bonuses) {
-            e.updatePosition(height);
-        }
     }
 
     public void drawEnnemy(Canvas canvas) {
