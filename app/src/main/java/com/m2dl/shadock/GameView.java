@@ -54,6 +54,8 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Sen
     private int indexOne=0;
     private int indexTwo=1;
 
+    private boolean fin = false;
+
     private final int background_color;
     private final int ball_color;
 
@@ -212,6 +214,19 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Sen
     }
 
     public void update() {
+        for (Ennemy e: ennemies) {
+            if((e.getX()-100<x && x<e.getX()+100) && (e.getY()-100 < y && y< e.getY()+100))
+                fin = true;
+        }
+        for(int i=0; i<bonuses.size();++i){
+            if((bonuses.get(i).getX()-100<x && x<bonuses.get(i).getX()+100) && (bonuses.get(i).getY()-100 < y && y< bonuses.get(i).getY()+100)){
+                System.out.println(score);
+                score = score +100;
+                System.out.println(score);
+                bonuses.remove(bonuses.get(i));
+                spawBonuses();
+            }
+        }
         if (!isFinDujeu()) {
             x = (int) Math.round(x + actualSpeed * acceleration);
         }
@@ -219,10 +234,12 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Sen
     }
 
     private boolean isFinDujeu() {
-        boolean fin = x + rayon > width || x - rayon < 0 || y - rayon < 0 || y + rayon > height;
         if (!dejaFini && fin) {
             dejaFini = true;
             mHandler.removeCallbacks(mUpdateTimeTask);
+            mHandlerUpdateEnnemy.removeCallbacks(mUpdateTimeEnemy);
+            ennemies.clear();
+            bonuses.clear();
             activity.showFin(score, pseudo);
             registerScore(score, pseudo);
         }
