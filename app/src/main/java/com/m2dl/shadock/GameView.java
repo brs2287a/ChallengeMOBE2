@@ -38,6 +38,7 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Sen
     private GameThread thread;
     private int x;
     private int y;
+    private int xEnnemy = 0;
     private Direction direction;
     private SensorManager sensorManager;
     private int actualSpeed = 1;
@@ -46,9 +47,14 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Sen
     private int score;
     private boolean dejaFini = false;
     private Handler mHandler;
+    private boolean timeToSpawn = false;
 
     private int background_color;
     private int ball_color;
+
+
+
+    private ArrayList<Ennemy> ennemies;
 
     // Access a Cloud Firestore instance from your Activity
     private FirebaseFirestore db = FirebaseFirestore.getInstance();
@@ -65,6 +71,10 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Sen
         }
     };
 
+    public ArrayList<Ennemy> getEnnemies() {
+        return ennemies;
+    }
+
     public GameView(Context context, AttributeSet attrs) {
         super(context, attrs);
         getHolder().addCallback(this);
@@ -73,6 +83,9 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Sen
 
         background_color = Accueil.sharedPreferences.getInt("BackgroundColor", Color.BLACK);
         ball_color = Accueil.sharedPreferences.getInt("BallColor", Color.WHITE);
+
+
+        ennemies = new ArrayList<>();
 
         thread = new GameThread(getHolder(), this);
         sensorManager = (SensorManager) context.getSystemService(Context.SENSOR_SERVICE);
@@ -157,6 +170,37 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Sen
             paint.setColor(this.ball_color);
             canvas.drawCircle(x, y, rayon,  paint);
         }
+        drawEnnemy(canvas);
+        for (Ennemy e: getEnnemies()) {
+            e.updatePosition(getHeight());
+        }
+    }
+
+    public void drawEnnemy(Canvas canvas){
+        int nbMax = (width/(rayon*2)) - 2;
+        if(xEnnemy>width){
+            xEnnemy = 0;
+        }
+
+        Paint paint = new Paint();
+        paint.setColor(Color.rgb(0, 0, 255));
+        System.out.println(ennemies.size());
+        if(ennemies.size()<=16){
+            Ennemy ennemy = new Ennemy(xEnnemy);
+            xEnnemy = xEnnemy+120;
+            ennemies.add(ennemy);
+        }
+
+        if(ennemies.size()==16){
+            timeToSpawn = true;
+        }
+        if(timeToSpawn){
+            System.out.println(ennemies.size());
+            for (Ennemy e: ennemies) {
+                canvas.drawCircle(e.getX(), e.getY(), rayon,  paint);
+            }
+        }
+
     }
 
 
