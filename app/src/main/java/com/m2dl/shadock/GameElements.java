@@ -20,9 +20,6 @@ public abstract class GameElements {
         this.y = y;
     }
 
-    public GameElements(){
-
-    }
 
     public boolean updatePosition(int height){
         boolean isHigher = false;
