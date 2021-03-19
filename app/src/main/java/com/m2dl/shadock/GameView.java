@@ -32,6 +32,7 @@ import static android.content.ContentValues.TAG;
 public class GameView extends SurfaceView implements SurfaceHolder.Callback, SensorEventListener {
 
     private static final int HAUTEUR_LIGNE_VIDE = 350;
+    private static long SPEED = 300;
     private final Sensor sensor;
     private final int width;
     private final int height;
@@ -85,7 +86,7 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Sen
         public void run() {
             updateEnnemies();
             updateBonus();
-            mHandlerUpdateEnnemy.postDelayed(this, 300);
+            mHandlerUpdateEnnemy.postDelayed(this, GameView.SPEED);
         }
     };
 
@@ -98,21 +99,59 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Sen
                     spawEnemies();
                 }
             }
-            if(ennemies.get(i).updatePosition(height)){
+            if (ennemies.get(i).updatePosition(height)) {
                 ennemies.remove(ennemies.get(i));
-            }else{
+            } else {
                 i++;
             }
         }
 
     }
+
+    public void augmentSpeed() {
+        if (GameView.SPEED > 10) {
+            GameView.SPEED -= 10;
+        }
+    }
+
+    public GameView(Context context, AttributeSet attrs) {
+        super(context, attrs);
+        getHolder().addCallback(this);
+        setFocusable(true);
+        direction = randomDirection();
+
+        background_color = Accueil.sharedPreferences.getInt("BackgroundColor", Color.BLACK);
+        ball_color = Accueil.sharedPreferences.getInt("BallColor", Color.WHITE);
+
+
+        ennemies = new ArrayList<>();
+        bonuses = new ArrayList<>();
+
+        thread = new GameThread(getHolder(), this);
+        sensorManager = (SensorManager) context.getSystemService(Context.SENSOR_SERVICE);
+        sensor = sensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
+        sensorManager.registerListener(this, sensor, SensorManager.SENSOR_DELAY_GAME);
+        width = this.getResources().getDisplayMetrics().widthPixels;
+        height = this.getResources().getDisplayMetrics().heightPixels;
+        x = width / 2;
+        y = height - (height / 15);
+        debut = System.currentTimeMillis() / 100;
+        mHandler = new Handler();
+        mHandler.postDelayed(mUpdateTimeTask, 100);
+        spawEnemies();
+        spawBonuses();
+        mHandlerUpdateEnnemy = new Handler();
+        mHandlerUpdateEnnemy.postDelayed(mUpdateTimeEnemy, 50);
+        GameView.SPEED = 200;
+    }
+
     private void updateBonus() {
-        int i=0;
-        while (i<bonuses.size()) {
-            if(bonuses.get(i).updatePosition(height)){
+        int i = 0;
+        while (i < bonuses.size()) {
+            if (bonuses.get(i).updatePosition(height)) {
                 bonuses.remove(bonuses.get(i));
                 spawBonuses();
-            }else{
+            } else {
                 i++;
             }
         }
@@ -158,35 +197,7 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Sen
     }
 
 
-    public GameView(Context context, AttributeSet attrs) {
-        super(context, attrs);
-        getHolder().addCallback(this);
-        setFocusable(true);
-        direction = randomDirection();
 
-        background_color = Accueil.sharedPreferences.getInt("BackgroundColor", Color.BLACK);
-        ball_color = Accueil.sharedPreferences.getInt("BallColor", Color.WHITE);
-
-
-        ennemies = new ArrayList<>();
-        bonuses = new ArrayList<>();
-
-        thread = new GameThread(getHolder(), this);
-        sensorManager = (SensorManager) context.getSystemService(Context.SENSOR_SERVICE);
-        sensor = sensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
-        sensorManager.registerListener(this, sensor, SensorManager.SENSOR_DELAY_GAME);
-        width = this.getResources().getDisplayMetrics().widthPixels;
-        height = this.getResources().getDisplayMetrics().heightPixels;
-        x = width / 2;
-        y = height - (height / 15);
-        debut = System.currentTimeMillis() / 100;
-        mHandler = new Handler();
-        mHandler.postDelayed(mUpdateTimeTask, 100);
-        spawEnemies();
-        spawBonuses();
-        mHandlerUpdateEnnemy = new Handler();
-        mHandlerUpdateEnnemy.postDelayed(mUpdateTimeEnemy, 100);
-    }
 
     @Override
     public void surfaceCreated(@NonNull SurfaceHolder holder) {
@@ -215,12 +226,10 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Sen
 
     public void update() {
         for (Ennemy e: ennemies) {
-            e.updatePosition(height);
             if ((e.getX() - 100 <= x && x <= e.getX() + 100) && (e.getY() - 100 <= y && y <= e.getY() + 100))
                 fin = true;
         }
         for(int i=0; i<bonuses.size();++i) {
-            bonuses.get(i).updatePosition(height);
             if ((bonuses.get(i).getX() - 100 <= x && x <= bonuses.get(i).getX() + 100) && (bonuses.get(i).getY() - 100 <= y && y <= bonuses.get(i).getY() + 100)) {
                 System.out.println(score);
                 score = score + 100;
@@ -230,7 +239,8 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Sen
             }
         }
         if (!isFinDujeu()) {
-            x = (int) Math.round(x + actualSpeed * acceleration);
+            int newValue = (int) Math.round(x + actualSpeed * acceleration);
+            x = newValue - 50 < 0 || newValue + 50 > width ? x : newValue;
         }
 
     }
