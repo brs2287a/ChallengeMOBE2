@@ -310,6 +310,9 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Sen
         if (canvas != null) {
             canvas.drawColor(this.background_color);
             mCustomImage.setBounds(new Rect(x - 50, y - 75, x + 50, y + 75));
+            canvas.drawColor(Color.WHITE);
+            Rect shadok = new Rect(x - 50, y - 75, x + 50, y + 75);
+            mCustomImage.setBounds(shadok);
             mCustomImage.draw(canvas);
 
             if (rythm) {
@@ -328,16 +331,21 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Sen
                 shadokTired.setBounds(new Rect(150, 500, 650, 900));
                 shadokTired.draw(canvas);
             }
+
+            drawEnnemy(canvas, shadok);
+            drawBonus(canvas);
         }
-        drawEnnemy(canvas);
-        drawBonus(canvas);
     }
 
-    public void drawEnnemy(Canvas canvas) {
+    public void drawEnnemy(Canvas canvas, Rect shadok) {
         Paint paint = new Paint();
         paint.setColor(Color.rgb(0, 0, 255));
         for (Ennemy e : ennemies) {
-            fuseeGibi.setBounds(new Rect(e.getX(), e.getY(), e.getX() + 125, e.getY() + 200));
+            Rect giby = new Rect(e.getX(), e.getY(), e.getX() + 125, e.getY() + 200);
+            if (giby.intersect(shadok)) {
+                fin = true;
+            }
+            fuseeGibi.setBounds(giby);
             fuseeGibi.draw(canvas);
             //canvas.drawCircle(e.getX(), e.getY(), rayon, paint);
         }
@@ -381,21 +389,21 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Sen
     public void onSensorChanged(SensorEvent event) {
         float axisX = event.values[0];
         if (axisX > 7) {
-            acceleration = -6;
+            acceleration = -8;
         } else if (axisX > 5) {
-            acceleration = -4;
+            acceleration = -6;
         } else if (axisX > 3) {
-            acceleration = -2;
+            acceleration = -3;
         } else if (axisX > 1) {
-            acceleration = -1;
+            acceleration = -2;
         } else if (axisX < -7) {
-            acceleration = 6;
+            acceleration = 8;
         } else if (axisX < -5) {
-            acceleration = 4;
+            acceleration = 6;
         } else if (axisX < -3) {
-            acceleration = 2;
+            acceleration = 3;
         } else if (axisX < -1) {
-            acceleration = 1;
+            acceleration = 2;
         } else {
             acceleration = 0;
         }
