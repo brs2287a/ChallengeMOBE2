@@ -84,6 +84,12 @@ public class Accueil extends Activity {
         finish();
     }
 
+    public void seeRegles(View view) {
+        Intent intent = new Intent(this, Regles.class);
+        startActivity(intent);
+        finish();
+    }
+
     public static boolean saveArray(List<Integer> list, Context mContext) {
         SharedPreferences prefs = mContext.getSharedPreferences("local", 0);
         SharedPreferences.Editor editor = prefs.edit();
