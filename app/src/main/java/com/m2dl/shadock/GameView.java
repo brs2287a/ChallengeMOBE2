@@ -78,6 +78,7 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Sen
     private final Drawable shadokPumpTwo;
     private final Drawable shadokTired;
     private final Drawable fuseeGibi;
+    private final Drawable passoire;
 
     private boolean pump = true;
     private boolean rythm = true;
@@ -174,6 +175,7 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Sen
         shadokPumpTwo = ResourcesCompat.getDrawable(getResources(), R.drawable.pump_way_two, null);
         shadokTired = ResourcesCompat.getDrawable(getResources(), R.drawable.tiringpump, null);
         fuseeGibi = ResourcesCompat.getDrawable(getResources(), R.drawable.fusee_gibi, null);
+        passoire = ResourcesCompat.getDrawable(getResources(), R.drawable.passoire_alpha, null);
 
     }
 
@@ -271,7 +273,7 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Sen
             if ((e.getX() - 100 <= x && x <= e.getX() + 100) && (e.getY() - 100 <= y && y <= e.getY() + 100))
                 fin = true;
         }
-        for(int i=0; i<bonuses.size();++i) {
+        /*for(int i=0; i<bonuses.size();++i) {
             if ((bonuses.get(i).getX() - 100 <= x && x <= bonuses.get(i).getX() + 100) && (bonuses.get(i).getY() - 100 <= y && y <= bonuses.get(i).getY() + 100)) {
                 System.out.println(score);
                 score = score + 100;
@@ -280,7 +282,7 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Sen
                 bonuses.remove(bonuses.get(i));
                 spawBonuses();
             }
-        }
+        }*/
         if (!isFinDujeu()) {
             int newValue = (int) Math.round(x + actualSpeed * acceleration);
             x = newValue - 50 < 0 || newValue + 50 > width ? x : newValue;
@@ -332,7 +334,7 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Sen
             }
 
             drawEnnemy(canvas, shadok);
-            drawBonus(canvas);
+            drawBonus(canvas, shadok);
         }
     }
 
@@ -350,11 +352,20 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Sen
         }
     }
 
-    public void drawBonus(Canvas canvas) {
+    public void drawBonus(Canvas canvas, Rect shadok) {
         Paint paint = new Paint();
         paint.setColor(Color.rgb(0, 255,0));
-        for (Bonus e : bonuses) {
-            canvas.drawCircle(e.getX(), e.getY(), rayon, paint);
+        for (int i=0; i<bonuses.size();++i) {
+            Rect passoireImg = new Rect(bonuses.get(i).getX(), bonuses.get(i).getY(), bonuses.get(i).getX() + 60, bonuses.get(i).getY() + 60);
+            if (passoireImg.intersect(shadok)) {
+                score = score + 100;
+                GameView.SPEED = 300;
+                bonuses.remove(bonuses.get(i));
+                spawBonuses();
+            }
+            passoire.setBounds(passoireImg);
+            passoire.draw(canvas);
+            //canvas.drawCircle(e.getX(), e.getY(), rayon, paint);
         }
     }
 
