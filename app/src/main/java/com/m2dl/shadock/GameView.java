@@ -31,7 +31,7 @@ import static android.content.ContentValues.TAG;
 
 public class GameView extends SurfaceView implements SurfaceHolder.Callback, SensorEventListener {
 
-    private static final int HAUTEUR_LIGNE_VIDE = 150;
+    private static final int HAUTEUR_LIGNE_VIDE = 350;
     private final Sensor sensor;
     private final int width;
     private final int height;
@@ -49,15 +49,20 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Sen
     private boolean dejaFini = false;
     private final Handler mHandler;
     private final Handler mHandlerUpdateEnnemy;
-    private final Handler mHandlerSpawnEnnemy;
     private Ennemy highestEnnemy;
-    private final boolean timeToSpawn = false;
+
+    private int indexOne=0;
+    private int indexTwo=1;
 
     private int background_color;
     private int ball_color;
 
+    private boolean endList = false;
+    private int nbMax;
+
 
     private final ArrayList<Ennemy> ennemies;
+    private final ArrayList<Bonus> bonuses;
 
     // Access a Cloud Firestore instance from your Activity
     private final FirebaseFirestore db = FirebaseFirestore.getInstance();
@@ -77,43 +82,79 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Sen
     private final Runnable mUpdateTimeEnemy = new Runnable() {
         public void run() {
             updateEnnemies();
+            updateBonus();
             mHandlerUpdateEnnemy.postDelayed(this, 300);
         }
     };
 
     private void updateEnnemies() {
-        for (Ennemy ennemy : ennemies) {
-            ennemy.updatePosition(height);
-            if (ennemy == highestEnnemy) {
-                if (ennemy.getY() > HAUTEUR_LIGNE_VIDE) {
+        int i=0;
+        while (i<ennemies.size()) {
+            ennemies.get(i).updatePosition(height);
+            if (ennemies.get(i) == highestEnnemy) {
+                if (ennemies.get(i).getY() > HAUTEUR_LIGNE_VIDE) {
                     spawEnemies();
                 }
             }
+            if(ennemies.get(i).updatePosition(height)){
+                ennemies.remove(ennemies.get(i));
+            }else{
+                i++;
+            }
         }
+
+    }
+    private void updateBonus() {
+        int i=0;
+        while (i<bonuses.size()) {
+            if(bonuses.get(i).updatePosition(height)){
+                bonuses.remove(bonuses.get(i));
+                spawBonuses();
+            }else{
+                i++;
+            }
+        }
+
     }
 
-    private final Runnable mUpdateTimeEnemySpawn = new Runnable() {
-        public void run() {
-            spawEnemies();
-        }
-    };
 
     private void spawEnemies() {
+
+        nbMax = (width / (rayon * 2));
+        System.out.println(nbMax);
         xEnnemy = 0;
-        for (int i = 0; i < 15; ++i) {
+        if(indexOne==nbMax-4){
+            endList = true;
+        }else if(indexOne == 0){
+            endList=false;
+        }
+        for (int i = 0; i < nbMax-1; ++i) {
             Ennemy ennemy = new Ennemy(xEnnemy);
             xEnnemy = xEnnemy + 120;
-            ennemies.add(ennemy);
+            if (indexOne != i && indexTwo!=i)
+                ennemies.add(ennemy);
         }
         Ennemy ennemy = new Ennemy(xEnnemy);
         xEnnemy = xEnnemy + 120;
         ennemies.add(ennemy);
         highestEnnemy = ennemy;
+        if(!endList){
+            indexOne = indexOne+2;
+            indexTwo= indexTwo+2;
+        }else if(endList){
+            indexOne = indexOne-2;
+            indexTwo= indexTwo-2;
+        }
+
+
+
+
+    }
+    private void spawBonuses() {
+        Bonus bonus = new Bonus(width, 200);
+        bonuses.add(bonus);
     }
 
-    public ArrayList<Ennemy> getEnnemies() {
-        return ennemies;
-    }
 
     public GameView(Context context, AttributeSet attrs) {
         super(context, attrs);
@@ -126,6 +167,7 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Sen
 
 
         ennemies = new ArrayList<>();
+        bonuses = new ArrayList<>();
 
         thread = new GameThread(getHolder(), this);
         sensorManager = (SensorManager) context.getSystemService(Context.SENSOR_SERVICE);
@@ -138,8 +180,8 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Sen
         debut = System.currentTimeMillis() / 100;
         mHandler = new Handler();
         mHandler.postDelayed(mUpdateTimeTask, 100);
-        mHandlerSpawnEnnemy = new Handler();
-        mHandlerSpawnEnnemy.postDelayed(mUpdateTimeEnemySpawn, 100);
+        spawEnemies();
+        spawBonuses();
         mHandlerUpdateEnnemy = new Handler();
         mHandlerUpdateEnnemy.postDelayed(mUpdateTimeEnemy, 100);
     }
@@ -215,21 +257,29 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Sen
             canvas.drawCircle(x, y, rayon,  paint);
         }
         drawEnnemy(canvas);
-        for (Ennemy e: getEnnemies()) {
-            e.updatePosition(getHeight());
+        for (Ennemy e: ennemies) {
+            e.updatePosition(height);
+        }
+        drawBonus(canvas);
+        for (Bonus e: bonuses) {
+            e.updatePosition(height);
         }
     }
 
     public void drawEnnemy(Canvas canvas) {
-        int nbMax = (width / (rayon * 2)) - 2;
-
         Paint paint = new Paint();
         paint.setColor(Color.rgb(0, 0, 255));
-
         for (Ennemy e : ennemies) {
             canvas.drawCircle(e.getX(), e.getY(), rayon, paint);
         }
+    }
 
+    public void drawBonus(Canvas canvas) {
+        Paint paint = new Paint();
+        paint.setColor(Color.rgb(0, 255,0));
+        for (Bonus e : bonuses) {
+            canvas.drawCircle(e.getX(), e.getY(), rayon, paint);
+        }
     }
 
 
