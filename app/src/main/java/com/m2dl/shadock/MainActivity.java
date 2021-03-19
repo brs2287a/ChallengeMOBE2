@@ -30,8 +30,6 @@ public class MainActivity extends Activity implements View.OnTouchListener, Sens
     private Button scoreButton;
     private Button homeButton;
 
-    private MyRocketView myRocketView;
-
     public SharedPreferences.Editor editor;
 
     private SensorManager sensorManager = null;
@@ -89,7 +87,6 @@ public class MainActivity extends Activity implements View.OnTouchListener, Sens
                         break;
                     case GAUCHE:
                         gameView.setDirection(GameView.randomDirection(gameView.getDirection()));
-
                         break;
                 }
                 break;
@@ -146,6 +143,7 @@ public class MainActivity extends Activity implements View.OnTouchListener, Sens
         startActivity(intent);
         finish();
     }
+
     public void seeHome(View v) {
         Intent intent = new Intent(this, Accueil.class);
         startActivity(intent);
@@ -165,7 +163,6 @@ public class MainActivity extends Activity implements View.OnTouchListener, Sens
             }
         });
     }
-
 
     public void setTextTv(String s) {
         tv.setText(s);

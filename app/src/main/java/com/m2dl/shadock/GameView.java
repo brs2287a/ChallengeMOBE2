@@ -52,9 +52,15 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Sen
 
     private int background_color;
     private int ball_color;
-    private final Drawable mCustomImage;
 
-    private MyRocketView rocketView;
+    private final Drawable mCustomImage;
+    private final Drawable shadokPumpOne;
+    private final Drawable shadokPumpTwo;
+    private final Drawable shadokTired;
+
+    private boolean pump = true;
+    private boolean rythm = true;
+    private boolean tired = false;
 
     // Access a Cloud Firestore instance from your Activity
     private final FirebaseFirestore db = FirebaseFirestore.getInstance();
@@ -62,6 +68,7 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Sen
     private final String pseudo = Accueil.sharedPreferences.getString("PlayerName", "Player 1");
     private final String guid = Accueil.sharedPreferences.getString("GUID", Accueil.guidNotRetrieve());
     private MainActivity activity;
+
     // un Runnable qui sera appelé par le timer
     private final Runnable mUpdateTimeTask = new Runnable() {
         public void run() {
@@ -92,6 +99,9 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Sen
         mHandler = new Handler();
         mHandler.postDelayed(mUpdateTimeTask, 100);
         mCustomImage = ResourcesCompat.getDrawable(getResources(), R.drawable.fusee_shadocks_resized, null);
+        shadokPumpOne = ResourcesCompat.getDrawable(getResources(), R.drawable.pump_way_one, null);
+        shadokPumpTwo = ResourcesCompat.getDrawable(getResources(), R.drawable.pump_way_two, null);
+        shadokTired = ResourcesCompat.getDrawable(getResources(), R.drawable.tiringpump, null);
     }
 
     @Override
@@ -145,6 +155,9 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Sen
     private boolean isFinDujeu() {
         boolean fin = x + rayon > width || x - rayon < 0 || y - rayon < 0 || y + rayon > height;
         if (!dejaFini && fin) {
+            pump = false;
+            rythm = false;
+            tired = true;
             dejaFini = true;
             mHandler.removeCallbacks(mUpdateTimeTask);
             activity.showFin(score, pseudo);
@@ -161,11 +174,25 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback, Sen
             canvas.drawColor(this.background_color);
             Paint paint = new Paint();
             paint.setColor(this.ball_color);
-            //canvas.drawCircle(x, y, rayon,  paint);
             mCustomImage.setBounds(new Rect(x - 50, y - 75, x + 50, y + 75));
             mCustomImage.draw(canvas);
 
-            //this.rocketView.draw(canvas);
+            if (rythm) {
+                if (pump) {
+                    shadokPumpOne.setBounds(new Rect(100, 100, 200, 200));
+                    shadokPumpOne.draw(canvas);
+                    pump = false;
+                } else {
+                    shadokPumpTwo.setBounds(new Rect(100, 100, 200, 200));
+                    shadokPumpTwo.draw(canvas);
+                    pump = true;
+                }
+            }
+
+            if (tired) {
+                shadokTired.setBounds(new Rect(100, 100, 500, 500));
+                shadokTired.draw(canvas);
+            }
         }
     }
 
